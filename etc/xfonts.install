@@ -1,0 +1,223 @@
+#!/bin/sh
+# xfonts.install - Copyright (c) 1994, Soliton Associates Limited
+#
+# @(#)xfonts.install	1.2 94/05/10
+
+# SAX X-window APL fonts installation script.
+#
+# syntax:
+#
+# xfonts.install [ -c ] [ -d font-output-directory ] [ -f pcf | snf | fb ]
+#
+#	-c	Copy distributed fonts rather than build (snf/pcf format only).
+#	-d	Font output directory.
+#	-f	Font output format.
+#
+# This script will install the distributed sax X-window APL fonts into the font
+# directory specified by (-d) in the format specified by (-f). The distributed
+# fonts are supplied in source Bit-Mapped-Distribution (bdf) format as well as
+# snf and pcf formats where applicable.
+#
+# The default install action for all font formats is to build the output fonts
+# from the source bdf fonts. The -c option can override this action for snf or
+# pcf output formats. In this case the pre-built distributed snf/pcf fonts will
+# simply be copied to the output directory. The -c(opy) option is not available
+# for the OpenWindow architecture specific bit mapped fb output format as these
+# fonts cannot by reliably pre-built.
+#
+# An attempt is made to provide appropriate defaults (based on the O/S id.) for
+# the font output format and font output directory. As well, defaults for the
+# SAXDIR (sax base distribution directory) and PATH (shell command search path)
+# are provided.
+
+
+SAXDIR=${SAXDIR:-/usr/sax/rel}	# default sax base distribution directory.
+
+Saxfdir=$SAXDIR/lib/fonts	# sax font distribution directory.
+
+PATH=/usr/openwin/bin:/usr/bin/X11:/usr/lpp/X11/bin:/usr/bin:$PATH
+
+umask 22
+
+
+#------	Defaults.
+
+OS=`uname -s`	# Operating System (ie: SunOS or AIX).
+ID=`uname -r`	# O/S release id (ie: 4.* or 5.* for SunOs, not used for AIX).
+FC=no		# no copy
+
+case	$OS$ID in
+
+	SunOS4*|SunOS5.1|SunOS5.2)	Fontdir=/usr/openwin/lib/fonts ;
+					Fontfmt=fb ;;
+
+	SunOS*)				Fontdir=/usr/openwin/lib/X11/fonts/misc;
+					Fontfmt=pcf ;;
+
+	AIX*)				Fontdir=/usr/lib/X11/fonts ;
+					Fontfmt=snf ;;
+
+	Linux*)				Fontdir=/usr/X11R6/lib/X11/fonts/misc;
+					Fontfmt=pcf ;;
+
+	*)				Fontdir=\\ ;
+					Fontfmt="" ;;
+
+esac
+
+
+#------	Local Shell functions.
+
+_usage_error()
+{
+echo ""
+echo "Usage error, syntax is:"
+echo ""
+echo "xfonts.install [ -c ] [ -d font-output-directory ] [ -f pcf | snf | fb ]"
+echo ""
+echo "	-c	Copy distributed fonts rather than build (snf/pcf format only)."
+echo "	-d	Font output directory."
+echo "	-f	Font output format."
+echo ""
+exit 1
+}
+
+#------
+
+_shift_chk()
+{
+	if [ ! $# -gt 1 ] ; then _usage_error ; fi
+}
+
+
+#------	Flag/argument processing.
+
+while	[ $# != 0 ]
+do
+	case	$1 in
+
+		-c)	FC=yes ;;
+
+		-d)	Fontdir=$2 ; _shift_chk $* ; shift ;;
+		-d*)	Fontdir=`expr "$1" : '-d\(.*\)'` ;;
+
+		-f)	Fontfmt=$2 ; _shift_chk $* ; shift ;;
+		-f*)	Fontfmt=`expr "$1" : '-f\(.*\)'` ;;
+
+		*)	_usage_error ;;
+	esac
+	shift
+done
+
+
+#------	Validation.
+
+if	[ ! -d $Saxfdir ]
+then
+			echo 'Sax font directory: $SAXDIR/lib/fonts not found.'
+			echo 'Sax base directory: SAXDIR='$SAXDIR
+			exit 2
+fi
+
+#------
+
+if	[ ! -d $Fontdir ]
+then
+			echo 'Font output directory: '$Fontdir' does not exist.'
+			_usage_error
+fi
+
+#------
+
+case	$Fontfmt in
+
+	snf | pcf | fb)	;;
+
+	*)		echo 'Font output format: '$Fontfmt' unknown.' ;
+			_usage_error ;;
+esac
+
+#------
+
+case	$Fontfmt$FC in
+
+	fbyes)		echo "Font -c(opy) option not supported for fb format.";
+			_usage_error ;;
+esac
+
+#------
+
+case	$Fontfmt$OS in
+
+	fbSunOS)	;;
+
+	fb*)		echo "Font format fb is only supported under SunOS" ;
+			exit 3 ;;
+esac
+
+
+#------	Copy/build.
+
+if	[ $FC = yes ]
+then
+	echo Copying $Saxfdir/*.$Fontfmt to $Fontdir
+	cp $Saxfdir/*.$Fontfmt $Fontdir/
+else
+	for File in $Saxfdir/*.bdf
+	do
+
+	Font=`basename $File .bdf`
+
+	case	$Fontfmt in
+
+		snf)	 bdftosnf $File > $Fontdir/$Font.snf ;;
+
+		pcf)	 bdftopcf $File > $Fontdir/$Font.pcf ;;
+
+		fb)	 convertfont -d $Fontdir -o $Font -n $Font $File ;;
+	esac
+
+	done
+fi
+
+
+#------	mkfontdir/bldfamily.
+
+case	$Fontfmt in
+
+	snf | pcf)	echo "mkfontdir $Fontdir";
+                              cd $Fontdir;
+			      mkfontdir .;
+                              xset fp rehash ;;
+
+	fb)		echo "bldfamily -d $Fontdir";
+			      bldfamily -d $Fontdir ;;
+
+esac
+
+
+#------	fonts.alias update.
+
+case	$Fontfmt in
+
+	snf | pcf)	echo "Updating: $Fontdir/fonts.alias"
+			touch $Fontdir/fonts.alias
+
+			for File in $Saxfdir/*.bdf
+			do
+
+				Font=`basename $File .bdf`
+
+				Xlfd=`grep -h "FONT -" $File | cut -c6-`
+
+				grep "$Font $Xlfd" $Fontdir/fonts.alias
+
+				if	[ $? != 0 ]
+				then
+				echo "$Font $Xlfd"
+				echo "$Font $Xlfd" >> $Fontdir/fonts.alias
+				fi
+
+			done
+			;;
+esac

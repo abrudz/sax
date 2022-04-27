@@ -1,0 +1,37 @@
+#!/bin/sh
+# saxscript - Copyright (c) 2000, Soliton Associates Limited 
+#
+
+# Stripped down version of "sax", specialized for running APL scripts.
+# Uses arguments as name of file containing APL immediate execution commands.
+
+# prevent BREAK from affecting shell script
+trap "" 2 3
+
+SAXDIR=${SAXDIR:-/usr/sax/rel}
+WSSIZE=${WSSIZE:-500000}
+APLPATH=${APLPATH:-$SAXDIR/bin/apl-8}
+SAXAPD=${SAXAPD:-$SAXDIR/bin/apd}
+SAXAPTAB=${SAXAPTAB:-$SAXDIR/etc/apd.tab}
+SAXAPDSM=${SAXAPDSM:-"-d0"}
+export SAXDIR WSSIZE APLPATH SAXAPD SAXAPTAB SAXAPDSM
+#
+case $SYS in
+SYSIBM6K)
+        LIBPATH="${LIBPATH}:${SAXDIR}/lib"
+        export LIBPATH
+        ;;
+SYSSPARC | SYSSOLIX86 | POSIX)
+        LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${SAXDIR}/lib"
+        export LD_LIBRARY_PATH
+        ;;
+*)
+        ;;
+esac
+#
+cat $* | `dirname $APLPATH`/apl-8 -B -J0 -L1$SAXDIR/lib/wss \
+		-L6$SAXDIR/lib/wss6 -L8$SAXDIR/lib/wss8 \
+                -L32$SAXDIR/lib/wss32 $WSSIZE $APLPARMS
+
+# tput clear
+

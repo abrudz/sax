@@ -1,0 +1,311 @@
+#!/bin/sh
+# samit.script - Copyright (c) 2002, Soliton Inc.
+#
+# @(#)samit.script	1.1.1.3 93/06/10
+#######################################################################
+#
+#          IMPORTANT
+#
+# samit.script does not handle multiple instances of samit well.
+# samit.script stop will kill all samit's running on the host.
+# The error logger assumes only one instance of samit too.
+#
+# LDB, Jan/28/98
+# A new argument 'status' is added to show PIDs of sami instances.
+# Two options of sami termination are offered:
+# 1. If PID is not supplied all instances of sami get terminated.
+# 2. If PID is supplied only this PID instance gets terminated.
+# The error logger is retired, and the problems above are gone.
+# All output will go into $SAMISTDOUT (/dev/console by default).
+#
+#######################################################################
+#  SHARP APL MAINFRAME INTERFACE (SAMIT) control script
+#
+# syntax:
+#	samit.script start
+#		[ -a path/samit ]
+#		[ -c LU6.2 connection name ]
+#		[ -m maximum variable size ]
+#		[ -p internet port number ]
+#		[ -H hostname ]
+#		[ -s number of shares ] 
+#		[ -u number of signons ]
+#		[ -v number ]
+#		[ -X path/quadavm ]
+#		[ -1 path/stdout ]
+#
+#	samit.script stop
+#		[ samit instance process id ]
+#
+#	samit.script status
+#
+# Flags are only applicable to the start option but are tolerated for
+# the stop option. Any invalid flags will cause either option to fail.
+# All flags are optional with defaults provided as listed below.
+#
+# For flags requiring additional arguments white space is allowed but
+# not required (ie: -apath/name or -a path/name).
+#
+# In the following flag description table the indicated markers are
+# used to define the type of flag and its argument requirements:
+#
+#   '#' indicates flags that can be specified more than once with
+#	each instance of the flag having a required argument.
+#
+#   '+' indicates flags used as switches (without arguments) that
+#	can be turned on using a - or off using a +.
+# 
+#   ' '	Flags not marked should be specified only once and require
+#	an argument.
+#
+#	With the exception of the multiple type '#' flags, only the
+#	last occurrence of a flag or option that is specified more
+#	than once is retained.
+#
+# -a	Path name of the executable binary for the samit.
+# -H    Hostname of network on which SAMI listens
+# -I	SAM NSVP TCP/IP IP address. (SAMIT)
+# -m 	Maximum variable size. 
+# -N	SAM NSVP name. (SAMIT)
+# -n	SAMI's name. (SAMIT)
+# -p	SAMI internet port number.
+# -P	SAM NSVP TCP/IP port number. (SAMIT)
+# -s	SAMI number of shares.
+# -S	SAX NSVP PORT NUMBER. (SAMIT)
+# -u	SAMI number of signons. 
+# -v	Additional debug information.
+# -X	Optional site specified quad avm.
+
+SAXDIR=${SAXDIR:-/usr/sax/rel}	# system view of sax release directory.
+SYS=`$SAXDIR/bin/sys`		# system type for this script.
+export SAXDIR SYS
+
+#	LDB, Jul/02/98
+#	Ensure that shared objects are found when needed
+#
+# case $SYS in
+# SYSIBM6K)
+# 	  LIBPATH=${SAXDIR}/lib
+# 	  export LIBPATH
+# 	  ;;
+# SYSSPARC | IX86)
+# 	  LD_LIBRARY_PATH=${SAXDIR}/lib
+# 	  export LD_LIBRARY_PATH
+# 	  ;;
+# *)
+# 	  ;;
+# esac
+
+# defaults
+# There are two channels between SAM and SAX
+#	via little endian samit: port 29431
+#	via big endian samit:	 port 29432
+#
+case $SYS in
+IX86)
+    SAMI_SAMPT="-P29431"			# -P (SAMIT)
+    ;;
+SYSSPARC | SYSIBM6K | *)
+    SAMI_SAMPT="-P29432"			# -P (SAMIT)
+    ;;
+esac
+SAMITDAEMON=${SAMITDAEMON:="$SAXDIR/bin/samit"}	# -a
+SAMI_VSIZE="-m70000"				# -m 
+SAMI_HOST=""					# -H
+SAMI_IPORT="-p2842"				# -p
+SAMI_SAMIP="-I10.1.100.10"			# -I (SAMIT)
+SAMI_SAMNM="-NNSVPTCPI"				# -N (SAMIT)
+SAMI_NAME="-nSAMITCPI"				# -n (SAMIT)
+SAMI_NSVPPT="-S405"				# -S (SAMIT)
+SAMI_SHARE="-s150"				# -s
+SAMI_SIGON="-u30"				# -u
+SAMI_DBUGV="-v0"				# -v
+SAMI_QDAVM=""					# -X
+SAMISTDOUT=${SAMISTDOUT:="/dev/console"}	# -1
+
+APL_TRACE=${APL_TRACE:="$SAXDIR/trc"}
+SAMI_PIDLOG=${SAMI_PIDLOG:="$SAXDIR/etc"}
+SAMI_PIDLOG=$SAMI_PIDLOG/.samitpid
+export APL_TRACE SAMI_PIDLOG
+
+_usage_error()
+{
+	USAGE="$0: invalid/missing flag, argument or option\n\
+usage: $0\n\
+\tstart\t[ -a path/sami ]\n\
+\t\t[ -m maximum variable size ]\n\
+\t\t[ -p internet port number ]\n\
+\t\t[ -H hostname ]\n\
+\t\t[ -s number of shares ]\n\
+\t\t[ -S SAX NSVP port number ]\n\
+\t\t[ -u number of signons ]\n\
+\t\t[ -v number ]\n\
+\t\t[ -X path/quadavm ]\n\
+\t\t[ -1 path/stdout ]\n\
+\t\t[ -I SAM's NSVP host IP]\n\
+\t\t[ -P SAM's NSVP port]\n\
+\t\t[ -N SAM's NSVP name]\n\
+\t\t[ -n SAMIT's name]\n\
+\tstatus\n\
+\tstop\t[ sami process id ]"
+	echo "$USAGE" > $SAMISTDOUT
+	exit 1
+}
+
+_shift_chk()
+{
+	if [ ! $# -gt 1 ] ; then _usage_error $* ; fi
+}
+
+_get_samipid()
+{
+# LDB Apr/29/99
+#	Let 'pse' retire because of its inconsistency
+#	from platform to platform
+
+	if [ -f $SAMI_PIDLOG ]
+	then
+		PID=`cat $SAMI_PIDLOG`
+	fi
+}
+
+PID=
+
+while	[ $# != 0 ]
+do
+	case $1 in
+
+	-a)	SAMITDAEMON=$2 ; _shift_chk $* ; shift ;;
+	-a*)	SAMITDAEMON=`expr "$1" : '-a\(.*\)'` ;;
+
+	-m)	SAMI_VSIZE="-m"$2 ; _shift_chk $* ; shift ;;
+	-m*)	SAMI_VSIZE="-m"`expr "$1" : '-m\(.*\)'` ;;
+
+	-n)	SAMI_NAME="-n"$2 ; _shift_chk $* ; shift ;;
+	-n*)	SAMI_NAME="-n"`expr "$1" : '-n\(.*\)'` ;;
+
+	-N)	SAMI_SAMNM="-N"$2 ; _shift_chk $* ; shift ;;
+	-N*)	SAMI_SAMNM="-N"`expr "$1" : '-N\(.*\)'` ;;
+
+	-p)	SAMI_IPORT="-p"$2 ; _shift_chk $* ; shift ;;
+	-p*)	SAMI_IPORT="-p"`expr "$1" : '-p\(.*\)'` ;;
+
+	-P)	SAMI_SAMPT="-P"$2 ; _shift_chk $* ; shift ;;
+	-P*)	SAMI_SAMPT="-P"`expr "$1" : '-P\(.*\)'` ;;
+
+	-s)	SAMI_SHARE="-s"$2 ; _shift_chk $* ; shift ;;
+	-s*)	SAMI_SHARE="-s"`expr "$1" : '-s\(.*\)'` ;;
+
+	-S)	SAMI_NSVPPT="-S"$2 ; _shift_chk $* ; shift ;;
+	-S*)	SAMI_NSVPPT="-S"`expr "$1" : '-S\(.*\)'` ;;
+
+	-u)	SAMI_SIGON="-u"$2 ; _shift_chk $* ; shift ;;
+	-u*)	SAMI_SIGON="-u"`expr "$1" : '-u\(.*\)'` ;;
+
+	-v)	SAMI_DBUGV="-v"$2 ; _shift_chk $* ; shift ;;
+	-v*)	SAMI_DBUGV="-v"`expr "$1" : '-v\(.*\)'` ;;
+
+	-X)	SAMI_QDAVM="-X"$2 ; _shift_chk $* ; shift ;;
+	-X*)	SAMI_QDAVM="-X"`expr "$1" : '-X\(.*\)'` ;;
+
+	-H)	SAMI_HOST="-H"$2 ; _shift_chk $* ; shift ;;
+	-H*)	SAMI_HOST="-H"`expr "$1" : '-H\(.*\)'` ;;
+
+	-I)	SAMI_SAMIP="-I"$2 ; _shift_chk $* ; shift ;;
+	-I*)	SAMI_SAMIP="-I"`expr "$1" : '-I\(.*\)'` ;;
+
+	-1)	SAMISTDOUT=$2 ; _shift_chk $* ; shift ;;
+	-1*)	SAMISTDOUT=`expr "$1" : '-1\(.*\)'` ;;
+
+	start)	SAMIOPTION="start";;
+	stop)	SAMIOPTION="stop"
+		shift
+		if [ $# != 0 ]
+		then
+			# pid should be obtained from
+			# ps -ef | grep SAMNSVP query
+			#
+			PID=$*
+		fi
+		break ;;
+
+	status) SAMIOPTION="status" ;;
+
+	*)	_usage_error $1
+		;;
+	esac
+	shift
+done
+
+
+case $SAMIOPTION in
+'start')
+	if [ ! -x $SAMITDAEMON ]
+	then
+		NOTSTARTED="$SAMITDAEMON not executable or missing"
+		echo $NOTSTARTED >$SAMISTDOUT
+		exit 2
+	fi
+
+	SAMIT="$SAMITDAEMON	\
+		$SAMI_VSIZE	\
+		$SAMI_IPORT	\
+		$SAMI_SHARE	\
+		$SAMI_SIGON	\
+		$SAMI_SAMIP	\
+		$SAMI_SAMNM	\
+		$SAMI_SAMPT	\
+		$SAMI_NSVPPT	\
+		$SAMI_NAME	\
+		$SAMI_DBUGV	\
+		$SAMI_HOST	\
+		$SAMI_QDAVM"
+
+	echo $SAMIT >$SAMISTDOUT
+	$SAMIT 1>>$SAMISTDOUT 2>&1 &
+	;;
+
+'stop')
+	if [ -z "$PID" ]
+	then
+		_get_samipid
+		STOPALL=Y
+	else
+		STOPALL=N
+	fi
+
+	if [ -n "$PID" ]
+	then
+		/bin/kill $PID
+		if [ $? = 0 ]
+		then
+			echo "samit (pid=$PID) terminated" >>$SAMISTDOUT
+		fi
+	fi
+
+	if [ $STOPALL = "Y" ]
+	then
+		rm -f $SAMI_PIDLOG
+	else
+		# To avoid confusion when replying to the future
+		# status requests we append the comment below to
+		# the logpid file marking each selectively stopped
+		# samit process as terminated
+		echo "$PID terminated at `date`" >>$SAMI_PIDLOG
+	fi
+	;;
+
+'status')
+	_get_samipid
+	if [ -n "$PID" ]
+	then
+		STATUS="pids:\n$PID"
+	else
+		STATUS="is not up"
+	fi
+	echo "samit $STATUS" >$SAMISTDOUT
+	;;
+*)
+	_usage_error $*
+	;;
+esac

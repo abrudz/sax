@@ -1,0 +1,58 @@
+Provide at least one file name following options from:
+-q	this summary
+- 	print standard input
+-i	file name(s) in standard input
+
+-b	use background			BGflag=0	no
+					       1	yes
+-c	nr of copies			Copy=#
+-C	formfeed character at pos 1	Charff="char"
+-d	printer name			Prt="text"
+-f	fontname			Font="text"
+-F	file cover pages		Filecov=0	no covers
+					        1	leading cover
+					        2	trailing cover
+					        3	both covers
+-h	print header			Headflag=0	no header
+					         1	only Head parameter
+					         2	only filename
+					         3	1 + 2
+					         4	only date & time
+					         5	1 + 4
+					         6	2 + 4
+					         7	1 + 2 + 4
+-H	heading				Head="text"
+-j	job cover pages			Jobcov=0	no covers
+					       1	leading cover
+					       2	trailing cover
+					       3	both covers
+-l	landscape orientation		Landscape=0	portrait
+					          1	landscape
+-L	max. lines per page		Lines=#
+-m	ok message "--30--" at end	Message=0	no
+					        1	yes
+-n	enable formfeed check pos 1	Newpage=0	no
+					        1	yes
+-N	name of file for header		Name="text"
+-o	name of output file		Outfile="text"
+-p	fontscale			Points=#
+-P	pagenumbering needed		Pagenr=0	no
+					       1	yes
+-r	name of spool request file	Req="text"
+-R	remove file			Remove=0	no
+					       1	yes
+-s	STSC character rom translation	STSCflag=0	no translation	
+					         1	STSC to SAX
+					         2	APL2 to SAX
+-S	start pagenumber		Startpg=#
+-t	tab stops			Tabs=#
+-v	verbose wys			Verbose=0	no
+					        1	yes
+-w	wrap lines			Wrap=0		no
+					     1		yes
+-W	wrap lines longer than length	Wrapl=#
+-x	wrap indentification character	Wrapc="char"
+-y	wrap indent length		Wrapi=#
+
+e.g., to get this overview and all the current settings use:
+wys -q|wys -j1 - or wys -q|wys -j1

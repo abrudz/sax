@@ -1,0 +1,36 @@
+sun-cmd|Sun Microsystems Inc. workstation,
+	am, km, msgr,
+	cols#80, lines#34,
+	bel=^G, bold=\E[1m, clear=\f, cr=\r, cub1=\b, cud1=\n,
+	cuf1=\E[C, cup=\E[%i%p1%d;%p2%dH, cuu1=\E[A,
+	dch=\E[%p1%dP, dch1=\E[P, dl=\E[%p1%dM, dl1=\E[M,
+	ed=\E[J, el=\E[K, ht=\t, ich=\E[%p1%d@, ich1=\E[@,
+	il=\E[%p1%dL, il1=\E[L, ind=\n,
+	kcub1=\E[217z, kcud1=\E[221z, kcuf1=\E[219z, kcuu1=\E[215z,
+	kf1=\E[224z, kf2=\E[225z, kf3=\E[226z,
+	kf4=\E[227z, kf5=\E[228z,
+	kf6=\E[229z, kf7=\E[230z, kf8=\E[231z, kf9=\E[232z,
+	rev=\E[7m, rmso=\E[m,
+	rmul=\E[m, rs2=\E[s, rmcup=\E[>4h, smcup=\E[>4l,
+	sgr=\E[0%?%p6%t;1%;%?%p2%t;4%;%?%p1%p3%|%t;7%;m,
+	sgr0=\E[m, smso=\E[7m, smul=\E[4m, krfr=\f, tsl=\E]l,
+#keys
+	kent=\r, kclr=\E[195z, kel=\E[211z, kend=\E[220,
+	kdch1=\E[213z, kich1=\E[212z, khome=\E[214z,
+	kpp=\E[216z, knp=\E[222z, kcbt=\127, kbs=^?,
+	kf10=\E[233z, kf11=\E[234z, kf12=\E[235z,
+# AP124 keys
+#       changed to use pfkeys 25 - 34           koji 1993-jan-5
+#       kf25:   enter2
+#       kf26:   pa1
+#       kf27:   pa2
+#       kf28:   pa3
+#       kf29:   newline
+#       kf30:   apl_backspace
+#       kf31:   apl_escape
+#       kf32:   tab
+#       kf33:   refresh
+#       kf34:   backtab
+	kf26=\E[208z, kf27=\E[209z, kf28=\E[210z, kf29=\l,
+	kf30=^P, kf31=^A, kf32=\t, kf25=\E[250z,
+

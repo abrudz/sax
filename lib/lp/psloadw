@@ -1,0 +1,14 @@
+#!/bin/sh
+
+if test $# = 0
+then Font=APL.font
+else Font=$1
+fi
+echo $Font
+Tmp=/var/tmp/psload
+cat $Font > $Tmp
+echo "\004" >> $Tmp
+cat $Tmp | lp
+rm $Tmp
+echo 'Loading APL Font'
+$SAXDIR/bin/wys $SAXDIR/lib/lp/qav -f/APL -p10

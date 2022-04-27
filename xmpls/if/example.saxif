@@ -1,0 +1,12 @@
+#
+#  Definition for  example  group of intrinsic functions
+#
+
+example		dynamic		/usr/sax/rel/etc/xmpl/if/example.si
+version		Cfunction	char *version(int)
+noop		Cfunction	int noop()
+adder		Cfunction	int adder(int, int *)
+uid2name	Cfunction	char *uid2name(int)
+name2uid	Cfunction	int name2uid(char *)
+gettimeofday	Cfunction	int gettimeofday({int, int}*, {int, int}*)
+strcmp		Cfunction	int strcmp(char *, char *)

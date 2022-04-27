@@ -1,0 +1,16 @@
+# tm228.ini - Copyright (c) 1992, I.P. Sharp Associates
+#
+# @(#)tm228.init	1.1.1.1 92/07/06
+#
+# Initialization File for SAX System for:
+#   TM228/TM229 (aka TM3000; Motorola VT220 compatible)
+#   assumes APL font downloaded
+# Function               Keystroke
+# ========               =========
+#  overstrike            shift of '<X' (DEL) key
+-o^P
+#  APL escape            "DO" key (top row)
+-Z^A
+# choose special output translate table 
+#
+-O$SAXDIR/lib/term/tm220tab

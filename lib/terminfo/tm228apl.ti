@@ -1,0 +1,210 @@
+tm228apl|tm229apl|Motorola tm228 & tm229 with 3100 & 3200 keyboard fully supported,
+# Other names for the 3100 keyboard are 3180 & 3220.
+# Other names for the 3200 keyboard are 3241 & 3179.
+#
+# This file is intended to be a guide for writing your own Terminfo
+# description. It lists every definition used by STIF, although not all
+# may be defined for this particular terminal.
+#
+#######################################################################
+#
+# Various status flags ...
+#
+# lines: number of lines
+# cols: number of columns
+# pad: pad character (rather than null)
+# xenl: newline ignored after 80 columns
+# mir: safe to move in insert mode
+# bw: auto left margin
+# am: auto right margin
+# km: terminal has a meta key
+# da: display may be retained above the screen
+# db: display may be retained below the screen
+# eo: space erases overstrikes
+# os: terminal overstrikes
+#
+# NOTE: if you specify "os", you must also specify "eo" for vi to work.
+	cols#80, lines#24,
+	mir, eo, xenl, am,
+# Initialization and termination stuff ...
+# is1: initialization string 1
+# is2: initialization string 2
+# is3: initialization string 3
+# if: initialization file
+# iprog: initialization program
+# rs1: reset terminal string1 (not used by STIF)
+# rs2: reset terminal string2 (not used by STIF)
+# rs3: reset terminal string3 (not used by STIF)
+	is1=\E[?3l,
+# is2:	\E\sG = select 8 bit c1 control transmission
+#		(this was changed to \E\sF so APL uses same state
+#		as AP124)
+#	\E> = numeric keypad mode on
+#	\E[?1;?4;?5;?6l =
+#	\E[?7;?8;?25h =
+#	\E7 = save cursor
+#	\E[1;24r =
+#	\E8 = restore cursor
+	is2=\E\sF\E>\E[?1;?4;?5;?6l\E[?7;?8;?25h\E7\E[1;24r\E8,
+	if=/usr/lib/term/tm220apl.dl,
+# Cursor motion commands ...
+#
+# smcup: to be sent before using "cup" (cursor motion)
+# rmcup: ends programs that use "cup"
+# cup: move cursor to given row, column
+# cub1: move cursor left 1 position
+# cuf1: move cursor left 1 position
+# cuu1: move cursor left 1 position
+# cud1: move cursor left 1 position
+# cub: move cursor left n positions
+# cuf: move cursor left n positions
+# cuu: move cursor left n positions
+# cud: move cursor left n positions
+# home: move cursor to top left corner
+# nel: newline (cr, lf)
+# cr: move cursor to column 1
+# ht: tab to next 8 space tab stop
+# ind: scroll text up 1 line
+# ri: scroll text down 1 line
+#
+	smcup=\E>\E[4l\E[?1;?4;?5;?6;?7;?18l\E[?8;?25h\E\sF,
+# \E\sF at end of following line used to be \E\sG.
+	rmcup=\E7\E[?25l\E[99;H\E[m\E[2K\E[1;24r\E8\E[?25h\E[?7h\E\sF,
+	cup=\E[%i%p1%d;%p2%dH,
+	cub1=\b, cuf1=\E[C, cuu1=\E[A, cud1=\n,
+	cub=\E[%p1%dD, cuf=\E[%p1%dC, cuu=\E[%p1%dA, cud=\E[%p1%dB,
+	home=\E[H, nel=\r\n, cr=\r, ind=\n, ri=\EM,
+# Attributes ...
+#
+# sgr: set all attributes with one command
+# sgr0: turn all attributes off
+# blink: turn blinking on
+# bold: high intensity
+# rev: reverse video
+# dim: half bright (not used by STIF)
+# invis: invisable (zero intensity) (not used by STIF)
+# smul: underline
+# rmul: exit underline mode (not used by STIF)
+# smacs: alternate character set
+# rmacs: exit alternate character set mode (not used by STIF)
+	sgr0=\E[0;32m^O,
+	blink=\E[5m, bold=\E[1m, rev=\E[7m,
+	smul=\E[4m, rmul=\E[24m,
+	smacs=^N, rmacs=^O,
+# Editing commands ...
+#
+# dch1: delete 1 character
+# dch: delete n characters (not used by STIF)
+# dl1: delete 1 line
+# dl: delete n lines (not used by STIF)
+# ich1: insert 1 blank character
+# ich: insert n blank characters (not used by STIF)
+# ip: insert padding after character inserted
+# il1: insert 1 blank line
+# il: insert n blank lines (not used by STIF)
+# clear: clear the screen, cursor to top left corner
+# el: erase to end of line
+# ed: erase to end of display
+# smir: insert mode on
+# rmir: insert mode off
+	dch1=\E[1P, dch=\E[%p1%dP,
+	dl1=\E[1M, dl=\E[%p1%dM,
+	ich=\E[%p1%d@,
+	il1=\E[1L, il=\E[%p1%dL,
+	clear=\E[H\E[J, el=\E[K, ed=\E[J,
+	smir=\E[4h, rmir=\E[4l,
+# Miscellaneous terminal commands ...
+# bel: sound the alarm!
+# flash: visible bell (used if terminal doesn't have an audible bell)
+# civis: make cursor invisible
+# cnorm: make cursor visible
+# cvvis: make cursor very visible
+	bel=^G,
+	flash=\E[?5h\200\200\200\200\200\200\200\200\200\200\E[?5l,
+	civis=\E[?25l, cnorm=\E[?25h,
+# Status line ...
+# hs: flag indicating terminal has a status line
+# wsl: width of status line
+# dsl: disable status line (not used by STIF)
+# tsl: move cursor to column 1 of status linen
+# fsl: restore cursor from status line
+	.hs, wsl#80, tsl=\E7\E[99;H, fsl=\E8,
+########################################################################
+#
+# Keyboard definitions ...
+#
+# kent: enter
+# kbs: backspace
+# kcbt: back tab
+# kcub1: left
+# kcuf1: right
+# kcuu1: up
+# kcud1: down
+# khome: home
+# kend: end
+# kdch1: delete character
+# kich1: insert toggle
+# kdl1: delete line key
+# kil1: insert line key
+# kclr: clear
+# kel: erase to end of line (field)
+# ked: erase to end of screen (not used by STIF)
+# krfr: refresh
+# kri: scroll up
+# kind: scroll down
+# kpp: page up
+# knp: page down
+# kcpy: copy (AP124 dup)
+# kmrk: mark (AP124 field mark)
+	kent=\l,
+	kbs=\177, kcbt=\EO<,
+	kcub1=\E[D, kcud1=\E[B, kcuf1=\E[C, kcuu1=\E[A,
+	khome=\E[4~,
+	kdch1=\E[6~, kich1=\E[5~,
+	kclr=\EOR, kel=\EOP, ked=\EOQ,
+	krfr=^L,
+#	kcpy=\E[1~, kmrk=\E[2~,
+# All PF keys are defined here (1-24).
+	kf1=\E[11~, kf2=\E[12~, kf3=\E[13~, kf4=\E[14~,
+	kf5=\E[15~, kf6=\E[17~, kf7=\E[18~, kf8=\E[19~,
+	kf9=\E[20~, kf10=\E[21~, kf11=\E[23~, kf12=\E[24~,
+	kf13=\EOa, kf14=\EOb, kf15=\EOc, kf16=\EOd,
+	kf17=\EOe, kf18=\EOf, kf19=\EOg, kf20=\EOh,
+	kf21=\EOi, kf22=\EOj, kf23=\EOk, kf24=\EOo,
+# Terminfo doesn't have definitions for the following, so I've used kf25 - 34:
+#	changed to use pfkeys 25 - 34		koji 1993-jan-5
+# kf25: enter2
+# kf26: pa1
+# kf27: pa2
+# kf28: pa3
+# kf29: newline
+# kf30: overstrike
+# kf31: alt char (APL toggle)
+# kf32: tab
+# kf33: reserved
+# kf34: reserved
+	kf25=\r, kf26=\EOE, kf27=\EOF, kf28=\EOG,
+	kf29=\l, kf30=\EOV, kf31=\E[29~, kf32=\t,
+	kf33=\E[1~, kf34=\E[2~,
+# NOTES:
+# 1) The home key is unshifted form of "|<-- / home" key
+# 2) The APL shift key is the "do" key.
+# 3) The overstrike key is shift "do".
+# Miscellaneous and potentially useful keys:
+#
+# khlp: help
+# kcmd: command
+# kprt: print
+	khlp=\E[28~,
+	kprt=\EOS,
+#######################################################################
+#
+# That's it for STIF required definitions. The remaining are here for
+# other programs that require them.
+#
+# Save and restore the cursor ...
+	sc=\E7, rc=\E8,
+# Enter and exit standout mode ...
+	smso=\E[7m, rmso=\E[27m,
+# Terminal uses xon/xoff
+	xon,

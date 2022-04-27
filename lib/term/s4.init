@@ -1,0 +1,13 @@
+# s4.ini - Copyright (c) 1992, I.P. Sharp Associates
+#
+# @(#)s4.init	1.1.1.1 92/07/06
+#
+#  Undo (cancel input)   ctrl-K
+-k^K
+# Overstrike		 ctrl-P
+-o^P
+#  refresh		 Rfrsh
+-f\033Na
+# Set APL prefix to sequence transmitted by "input mode" key:
+-Z\033\116\152
+

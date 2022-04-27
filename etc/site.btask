@@ -1,0 +1,10 @@
+#------	Site specifiable Btask Scheduler configuration parameters.
+
+#   Refer to the SAX administrators manual or $SAXDIR/etc/btask.scheduler for
+#   valid options. Place options you wish to specify within the quotation
+#   marks in the following assignment statement.
+#
+#	Example: SITE_BTASK=" -a/home/btask "
+
+
+SITE_BTASK=" "

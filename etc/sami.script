@@ -1,0 +1,278 @@
+#!/bin/sh
+# sami.script - Copyright (c) 2002, Soliton Inc.
+#
+# @(#)sami.script	1.1.1.3 93/06/10
+#######################################################################
+#
+#          IMPORTANT
+#
+# sami.script does not handle multiple instances of sami well.
+# sami.script stop will kill all sami's running on the host.
+# The error logger assumes only one instance of sami too.
+#
+#######################################################################
+#  SHARP APL MAINFRAME INTERFACE (SAMI) control script.
+#
+# syntax: sami.script start [ -a path/sami ] [ -c LU6.2 connection name ]
+#	     [ -d number ] [ -m maximum variable size ]
+#	     [ -p internet port number ] [-H hostname ]
+#	     [ -s number of shares ] 
+#	     [ -u number of signons ] [ -v number ]
+#	     [ -X path/quadavm ]
+#	     [ -1 path/stdout ] [ -2 path/stderr ]
+#
+#	  sami.script stop
+#
+# Flags are only applicable to the start option but are tolerated for
+# the stop option. Any invalid flags will cause either option to fail.
+# All flags are optional with defaults provided as listed below.
+#
+# For flags requiring additional arguments white space is allowed but
+# not required (ie: -apath/name or -a path/name).
+#
+# In the following flag description table the indicated markers are
+# used to define the type of flag and its argument requirements:
+#
+#   '#' indicates flags that can be specified more than once with
+#	each instance of the flag having a required argument.
+#
+#   '+' indicates flags used as switches (without arguments) that
+#	can be turned on using a - or off using a +.
+# 
+#   ' '	Flags not marked should be specified only once and require
+#	an argument.
+#
+#	With the exception of the multiple type '#' flags, only the
+#	last occurrence of a flag or option that is specified more
+#	than once is retained.
+#
+# -a	Path name of the executable binary for the sami.
+# -c	LU6.2 Logical Connection profile.
+# -d	Debug flags, produce messages to stdout (2147483647=full debug).
+# -H    hostname of network on which SAMI listens
+# -m 	Maximum variable size. 
+# -p	SAMI internet port number.
+# -s	SAMI number of shares.
+# -u	SAMI number of signons. 
+# -v	Additional debug information.
+# -X	Optional site specified quad avm.
+
+SAXDIR=${SAXDIR:-/usr/sax/rel}	# system view of sax release directory.
+SYS=`$SAXDIR/bin/sys`		# system type for this script.
+export SAXDIR SYS
+
+#       LDB, Jan/21/00
+#       Ensure that shared objects are found when needed
+#
+# case $SYS in
+# SYSIBM6K)
+# 	  LIBPATH=${SAXDIR}/lib
+# 	  export LIBPATH
+# 	  ;;
+# *)
+# 	  echo "Sami is not supported"
+# 	  exit
+# 	  ;;
+# esac
+
+# defaults
+
+#	LDB, Dec/16/97
+#	-d option became obsolete
+#	turn on/turn off a debug mode
+#	via a sami trace control file
+#
+#SAMI_DEBUG="-d0"				# -d
+
+SAMIDAEMON="$SAXDIR/bin/sami"			# -a
+SAMI_LU62C="-cSAMNSVP"				# -c 
+SAMI_VSIZE="-m70000"				# -m 
+SAMI_HOST=""					# -H
+SAMI_IPORT="-p2842"				# -p
+SAMI_SHARE="-s150"				# -s
+SAMI_SIGON="-u30"				# -u
+SAMI_DBUGV="-v0"				# -v
+SAMI_QDAVM=""					# -X
+SAMISTDOUT=${SAMISTDOUT:="/dev/console"}	# -1
+SAMISTDERR="/tmp/samierrs-p"			# -2  
+
+#	LDB, Dec/16/97
+#	Location for trace files 
+#
+APL_TRACE=${APL_TRACE:="$SAXDIR/trc"}
+SAMI_PIDLOG=${SAMI_PIDLOG:="$SAXDIR/etc"}
+SAMI_PIDLOG=$SAMI_PIDLOG/.samipid
+export APL_TRACE SAMI_PIDLOG
+
+# mbc - Nov 13, 96
+# RFE spot #11962
+# SAMI now splits up its error log files with suffices 0, 1, 2, ... etc.
+# default /usr/adm/samierrs0 ...
+
+if [ ! -p $SAMISTDERR ]
+then
+	rm -f $SAMISTDERR
+	mknod $SAMISTDERR p
+else
+	chmod 600 $SAMISTDERR
+fi
+
+
+_usage_error()
+{
+	USAGE="$0: invalid/missing flag, argument or option\n\
+usage: $0\n\
+\tstart\t[ -a path/sami ]\n\
+\t\t[ -c LU6.2 connection name ]\n\
+\t\t[ -m maximum variable size ]\n\
+\t\t[ -p internet port number ]\n\
+\t\t[ -H hostname ]\n\
+\t\t[ -s number of shares ]\n\
+\t\t[ -u number of signons ]\n\
+\t\t[ -v number ]\n\
+\t\t[ -X path/quadavm ]\n\
+\t\t[ -1 path/stdout ]\n\
+\tstatus\n\
+\tstop\t[ sami process id ]"
+	echo "$USAGE" >> $SAMISTDOUT
+	exit 1
+}
+
+_shift_chk()
+{
+	if [ ! $# -gt 1 ] ; then _usage_error $* ; fi
+}
+
+_get_samipid()
+{
+	if [ -f $SAMI_PIDLOG ]
+	then
+		PID=`cat $SAMI_PIDLOG`
+	fi
+}
+
+
+while	[ $# != 0 ]
+do
+	case $1 in
+
+	-a)	SAMIDAEMON=$2 ; _shift_chk $* ; shift ;;
+	-a*)	SAMIDAEMON=`expr "$1" : '-a\(.*\)'` ;;
+
+	-c)	SAMI_LU62C="-c"$2 ; _shift_chk $* ; shift ;;
+	-c*)	SAMI_LU62C="-c"`expr "$1" : '-c\(.*\)'` ;;
+
+	-m)	SAMI_VSIZE="-m"$2 ; _shift_chk $* ; shift ;;
+	-m*)	SAMI_VSIZE="-m"`expr "$1" : '-m\(.*\)'` ;;
+
+	-p)	SAMI_IPORT="-p"$2 ; _shift_chk $* ; shift ;;
+	-p*)	SAMI_IPORT="-p"`expr "$1" : '-p\(.*\)'` ;;
+
+	-s)	SAMI_SHARE="-s"$2 ; _shift_chk $* ; shift ;;
+	-s*)	SAMI_SHARE="-s"`expr "$1" : '-s\(.*\)'` ;;
+
+	-u)	SAMI_SIGON="-u"$2 ; _shift_chk $* ; shift ;;
+	-u*)	SAMI_SIGON="-u"`expr "$1" : '-u\(.*\)'` ;;
+
+	-v)	SAMI_DBUGV="-v"$2 ; _shift_chk $* ; shift ;;
+	-v*)	SAMI_DBUGV="-v"`expr "$1" : '-v\(.*\)'` ;;
+
+	-X)	SAMI_QDAVM="-X"$2 ; _shift_chk $* ; shift ;;
+	-X*)	SAMI_QDAVM="-X"`expr "$1" : '-X\(.*\)'` ;;
+
+	-H)	SAMI_HOST="-H"$2 ; _shift_chk $* ; shift ;;
+	-H*)	SAMI_HOST="-H"`expr "$1" : '-H\(.*\)'` ;;
+
+	-1)	SAMISTDOUT=$2 ; _shift_chk $* ; shift ;;
+	-1*)	SAMISTDOUT=`expr "$1" : '-1\(.*\)'` ;;
+
+	-2)	SAMISTDERR=$2 ; _shift_chk $* ; shift ;;
+	-2*)	SAMISTDERR=`expr "$1" : '-2\(.*\)'` ;;
+
+	start)	SAMIOPTION="start";;
+	stop)	SAMIOPTION="stop"
+		shift
+		if [ $# != 0 ]
+		then
+			PID=$*
+		fi
+		break
+		;;
+
+	status)	SAMIOPTION="status" ;;
+
+	*)	_usage_error $1
+		;;
+	esac
+	shift
+done
+
+
+case $SAMIOPTION in
+'start')
+	if [ ! -x $SAMIDAEMON ]
+	then
+		NOTSTARTED="$SAMIDAEMON not executable or missing"
+		echo $NOTSTARTED >>$SAMISTDOUT
+		exit 2
+	fi
+
+	SAMI="$SAMIDAEMON	\
+		$SAMI_LU62C	\
+		$SAMI_VSIZE	\
+		$SAMI_IPORT	\
+		$SAMI_SHARE	\
+		$SAMI_SIGON	\
+		$SAMI_DBUGV	\
+		$SAMI_HOST	\
+		$SAMI_QDAVM"
+
+	echo $SAMI >>$SAMISTDOUT
+	$SAMI 1>>$SAMISTDOUT &
+	;;
+
+'stop')
+	if [ -z "$PID" ]
+	then
+		_get_samipid
+		STOPALL=Y
+	else
+		STOPALL=N
+	fi
+
+	if [ -n "$PID" ]
+	then
+		/bin/kill $PID
+		if [ $? = 0 ]
+		then
+			echo "sami (pid=$PID) terminated" >>$SAMISTDOUT
+		fi
+	fi
+
+	if [ $STOPALL = "Y" ]
+	then
+		rm -f $SAMI_PIDLOG
+	else
+		# To avoid confusion when replying to the future
+		# status requests we append the comment below to
+		# the logpid file marking each selectively stopped
+		# sami process as terminated
+		echo "$PID terminated at `date`" >>$SAMI_PIDLOG
+	fi
+	;;
+
+'status')
+	_get_samipid
+	if [ -n "$PID" ]
+	then
+		STATUS="pids: $PID"
+	else
+		STATUS="is not up"
+	fi
+	echo "sami $STATUS" >>$SAMISTDOUT
+	;;
+*)
+	_usage_error $*
+	;;
+esac
+

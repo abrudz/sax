@@ -1,0 +1,51 @@
+#!/bin/sh
+# saxfsoi - Copyright (c) 1993, Soliton Associates
+#
+
+#!/bin/sh
+# Stripped down version of "sax", specialized for xfer of APL files.
+# Uses argument 1 as name of APL file (old sax).
+# Uses argument 2 as name of APL file (new sax).
+# 
+# NOTE: \0314 = APL [], \0373 = <-, \0310 = 'delta', \0374 = 'delta underbar'.
+#       in order to make this file readable and changeable with vi, we used
+#       the following convertions, # = APL [], < = <-.
+#       + and = are the unix replacements for 'delta' and 'delta underbar'.	
+
+SAXDIR=${SAXDIR:-/usr/sax/rel}
+WSSIZE=${WSSIZE:-1500000}
+APLPATH=${APLPATH:-$SAXDIR/bin/apl-8}
+SAXBANNER=/dev/null
+SAXOLD=${SAXOLD:-/usr/sax/old}
+SAXAPD=${SAXAPD:-$SAXDIR/bin/apd}
+SAXAPTAB=${SAXAPTAB:-$SAXDIR/etc/apd.tab}
+SAXAPDSM=${SAXAPDSM:-"-d0"}
+export SAXDIR WSSIZE APLPATH SAXBANNER SAXOLD SAXAPD SAXAPTAB SAXAPDSM
+
+fsoiIN=$1##
+fsoiIN=`echo $fsoiIN | sed -e 's/\.f##//' -e 's/\.[is]f##//' -e 's/##//'`
+fsoiIN=`echo $fsoiIN | tr "+=" "\310\374"`
+
+fsoiOUT=$2##
+fsoiOUT=`echo $fsoiOUT | sed -e 's/\.f##//' -e 's/\.[is]f##//' -e 's/##//'`
+fsoiOUT=`echo $fsoiOUT | tr "+=" "\310\374"`
+
+TMPI=./SAXFSOIi$$
+TMPO=./SAXFSOIo$$
+rm -f $TMPI $TMPO
+echo ")xload 1 xfer" > $TMPI
+echo "xferfile '$fsoiIN'" >> $TMPI
+
+echo "#trap <'a c'" | tr "#<" "\314\373" > $TMPO
+echo "'$fsoiOUT' #stie 1" | tr "#<" "\314\373" >> $TMPO
+echo "'$fsoiOUT' #erase 1" | tr "#<" "\314\373" >> $TMPO
+echo "#trap <''" | tr "#<" "\314\373" >> $TMPO
+echo "'$fsoiOUT' #create 1" | tr "#<" "\314\373" >> $TMPO
+
+(cat $TMPO; cat $TMPI | $SAXOLD/apl-8 -B -L1$SAXOLD $WSSIZE \
+	$APLPARMS | tail +3lf) | `dirname $APLPATH`/apl-8 -B -J0 $WSSIZE \
+	$APLPARMS
+
+rm -f $TMPI $TMPO
+
+exit 0			# to keep makefiles happy

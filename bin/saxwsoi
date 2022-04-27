@@ -1,0 +1,54 @@
+#!/bin/sh
+# saxwsoi - Copyright (c) 1993, Soliton Associates
+#
+
+#!/bin/sh
+# Stripped down version of "sax", specialized for xfer of APL workspaces.
+# Uses argument 1 as name of APL workspace (old sax).
+# Uses argument 2 as name of APL workspace (new sax).
+# Uses argument 3 as flag for xfer, 1 = include xfer fns and vars.
+# 
+# NOTE: \0314 = APL [], \0373 = <-, \0310 = 'delta', \0374 = 'delta underbar'.
+#       in order to make this file readable and changeable with vi, we used
+#       the following convertions, # = APL [], < = <-.
+#       + and = are the unix replacements for 'delta' and 'delta underbar'.	
+
+SAXDIR=${SAXDIR:-/usr/sax/rel}
+WSSIZE=${WSSIZE:-1500000}
+APLPATH=${APLPATH:-$SAXDIR/bin/apl-8}
+SAXBANNER=/dev/null
+SAXOLD=${SAXOLD:-/usr/sax/old}
+SAXAPD=${SAXAPD:-$SAXDIR/bin/apd}
+SAXAPTAB=${SAXAPTAB:-$SAXDIR/etc/apd.tab}
+SAXAPDSM=${SAXAPDSM:-"-d0"}
+export SAXDIR WSSIZE APLPATH SAXBANNER SAXOLD SAXAPD SAXAPTAB SAXAPDSM
+
+wsoiIN=$1##
+wsoiIN=`echo $wsoiIN | sed -e 's/\.w##//' -e 's/\.[is]w##//' -e 's/##//'`
+wsoiIN=`echo $wsoiIN | tr "+=" "\310\374"`
+
+wsoiOUT=$2##
+wsoiOUT=`echo $wsoiOUT | sed -e 's/\.w##//' -e 's/\.[is]w##//' -e 's/##//'`
+wsoiOUT=`echo $wsoiOUT | tr "+=" "\310\374"`
+
+wsoiFLG=$3
+
+TMPI=./SAXWSOIi$$
+TMPO=./SAXWSOIo$$
+rm -f $TMPI $TMPO
+
+echo ")xload $wsoiIN" > $TMPI
+echo ")copy 1 xfer xfer" >> $TMPI
+echo "$wsoiFLG xfer '$wsoiIN'"  >> $TMPI
+
+echo ")wsid $wsoiOUT" > $TMPO
+echo "#PARSE #nl 3" | tr "#<" "\314\373" >> $TMPO
+echo ")save" >> $TMPO
+
+cat $TMPI | $SAXOLD/apl-8 -B -L1$SAXOLD $WSSIZE $APLPARMS | \
+	(tail +4lf; cat $TMPO) | `dirname $APLPATH`/apl-8 -B -J0 \
+	$WSSIZE $APLPARMS 
+
+rm -f $TMPI $TMPO
+
+exit 0			# to keep makefiles happy

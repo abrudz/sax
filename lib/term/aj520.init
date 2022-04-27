@@ -1,0 +1,22 @@
+# aj520.ini - Copyright (c) 1992, I.P. Sharp Associates
+#
+# @(#)aj520.init	1.1.1.1 92/07/06
+#
+# Initialization file for SAX for AJ520
+#
+# Initialization of terminal:
+#
+# ANSI mode:                           \033<
+# Reset cursor key application mode:   \033[?1l
+# PFkey native programs:               \033[2u
+-a\033<\033[?1l\033[2u
+# Function               Keystroke
+# ========               =========
+#  overstrike            ctrl-P
+-o^P
+#  APL escape            ctrl-A
+-Z^A
+#
+# choose output translate table for typewriter paired apl/ascii terminal
+#
+-O$SAXDIR/lib/term/aplotab

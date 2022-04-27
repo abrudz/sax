@@ -1,0 +1,20 @@
+# aixterm.ini - Copyright (c) 1992, I.P. Sharp Associates
+#
+# @(#)aixterm.init	1.1.1.2 93/02/01
+#
+# Initialization file for SAX for
+# xterm windows
+#
+# Initialization of terminal:
+#
+# reset cursor key application mode
+# -a\033[?1l
+#
+# APL escape to ctrl-A
+-Z^A
+#
+# APL overstrike to ctrl-P
+-o^P
+#
+# output table
+-O$SAXDIR/lib/term/Xotab

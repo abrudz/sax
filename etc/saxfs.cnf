@@ -1,0 +1,18 @@
+#   saxfs.cnf -  Copyright 1995, Soliton Associates Ltd.
+#   SAX FS4 Default Configuration File
+
+#   mandatory parameters
+#   likely to be changed on site
+#SHMADDR	3204448256	BF000000 shared memory base address (msq & pipe)
+SHMADDR		3201953792	BED9F000 shared memory base address (udp socket)
+KEYBASE		100			IPCs key base
+#SAXUSER		523			administrator uid
+#SAXGROUP	103			administrator gid
+IOSERVERS	3			number of I/O servers (fsios processes)
+MAXPROC		256			max number of connected processes must be a multiple of 32
+EXTSIZE		102400000	size of one extent in bytes (s.b. >= 1024000)
+BUFFERS		4000		number of buffers, must be an even number
+MAXCOMPSIZE	1024000		max comp size
+FTABLESIZE	1024		max number of entries in file table
+TTABLESIZE	1024		max number of entries in tie table
+DISKSPALLOC 0			fast disk space pre-allocation, 1 - slow

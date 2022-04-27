@@ -1,0 +1,17 @@
+# hft.ini - Copyright (c) 1992, I.P. Sharp Associates
+#
+# @(#)hft.init	1.1.1.1 92/07/06
+#
+# Initialization file for SAX for
+# xterm windows
+#
+# Initialization of terminal:
+#
+# reset cursor key application mode
+# -a\033[?1l
+# APL escape to ctrl-A
+-Z^A
+# APL overstrike to ctrl-P
+-o^P
+# output table
+-O$SAXDIR/lib/term/rawotab

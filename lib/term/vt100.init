@@ -1,0 +1,24 @@
+# vt100.ini - Copyright (c) 1992, I.P. Sharp Associates
+#
+# @(#)vt100.init	1.1.1.4 93/01/18
+#
+# Initialization file for SAX for
+#   DEC VT100 and other terminals with ANSI Standard keyboard.
+#
+# Initialization of terminal:
+#
+# ANSI mode:                           \033<
+# Reset cursor key application mode:   \033[?1l
+# PFkey native programs:               \033[2u
+-a\033<\033[?1l
+#
+# Function               Keystroke
+# ========               =========
+#  overstrike            ctrl-P
+-o^P
+#  APL escape            ctrl-A
+-Z^A
+#
+# choose output translate table for typewriter paired apl/ascii terminal
+#
+-O$SAXDIR/lib/term/aplrtab

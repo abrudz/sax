@@ -1,0 +1,50 @@
+# apd.tab -  Copyright (c) 2000, Soliton Associates Limited
+#
+#
+# Sample file for "apd" (AP Daemon)
+#
+# Format is:
+#
+#	apid: sprintf() string
+#
+# To specify a default for an environment variable:  
+#
+#	.ENVNAME=VALUE
+#
+# Parameters to sprintf() will be:
+#
+#	your apid, your cid, your nsox, partner apid, partner clone id,
+#	pox, sv name
+#
+# These are specified in the string as:
+#
+#	%APID, %CID, %NSOX, %OAPID, %OCID, %POX, %NAME
+#
+# The sprintf() string can have environment variables specified by:
+#
+#	$VARNAME
+#
+# Upon receipt of an offer APD will apply the arguments to
+# the sprintf() string and exec() the result.
+#
+# Notes:
+# 1) The sprintf() string is parsed for arguments with space as
+#	the separator. To include a space in the argument, precede
+#	it with \.
+# 2) To include a ", \, or % in the string precede it with \.
+#
+# 3) Defaults for environment variables are not exported to the environment. 
+#
+#	We no longer support ap124 for sunview system.      1996-JUL-29
+#	This apd.tab is used for when apl-8 is used for sax session.
+#
+
+.SAXDIR=/usr/sax/rel/
+.APLPATH=$SAXDIR/bin/apl
+
+1:	$APLPATH $WSSIZE -L1$SAXDIR/lib/wss -L6$SAXDIR/lib/wss6  -L8$SAXDIR/lib/wss8 -L32$SAXDIR/lib/wss32  $APLPARMS -P%APID,-1 -Q%NSOX,%OAPID,%OCID,%POX,%NAME -W
+
+11:	$SAXDIR/bin/hostap -i%APID,%CID -r%NSOX,%OAPID,%OCID,%POX,%NAME
+
+124:	$SAXDIR/bin/ap124 $AP124PARMS -i%APID,%CID -r%NSOX,%OAPID,%OCID,%POX,%NAME
+

@@ -1,0 +1,25 @@
+#!/bin/sh 
+# psload - Copyright (c) 1993, Soliton Associates Limited
+#
+# @(#)psload	1.2 93/06/08
+# $Header: /usr/cvsroot/sax/src/lib/lp/psload,v 1.2 2000/11/14 20:19:54 dragan Exp $
+# UNIX script to accomodate PostScript printing
+
+Fonts=$*
+Prt=${Prt:-LW}
+
+if test -z "$Fonts"
+then Fonts=APLitalic.perm
+fi
+
+for i in $Fonts
+do
+	echo "Loading "$i
+	if test -f /usr/bin/arch -o -f /bin/arch
+	then cat $i | lpr -h -P$Prt
+	else cat $i | lp
+	fi
+done
+
+echo "Preparing Atomic Vector for Printing"
+wys qav

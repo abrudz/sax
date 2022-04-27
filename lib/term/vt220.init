@@ -1,0 +1,26 @@
+# vt220.ini - Copyright (c) 1992, I.P. Sharp Associates
+#
+# @(#)vt220.init	1.1.1.1 92/07/06
+#
+# Initialization file for SAX for
+#   DEC VT220 and other terminals with ANSI Standard keyboard.
+#
+# Initialization of terminal:
+#
+# ANSI mode:                           \033<
+# Reset cursor key application mode:   \033[?1l
+-a\033<\033[?1l
+#
+# Function               Keystroke
+# ========               =========
+#  overstrike            ctrl-P
+-o^P
+#  APL escape            ctrl-A
+-Z^A
+#
+# send a control O after we quit to put us back into ASCII.k
+-A^O
+#
+# choose output translate table for typewriter paired apl/ascii terminal
+#
+-O$SAXDIR/lib/term/tm220tab

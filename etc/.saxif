@@ -1,0 +1,346 @@
+#
+#   unix intrinisic function prototypes
+#
+
+Sunix	dynamic		$SAXDIR/lib/Sunix.si
+Sversion Cfunction	char *Sversion(int)
+Snoop	Cfunction	int Snoop()
+
+constant Cfunction	int constant(char *)
+constants Cfunction	char *constants()
+
+#
+# File functions
+#
+
+select_l Cfunction	select_l(int *, int *, int *, int *, int *, int *, int *)
+errno	Cfunction	int Errno()
+strerror Cfunction	char *strerror(int)
+open	Cfunction	int open(char *, int, int)
+creat	Cfunction	int creat(char *, int)
+umask	Cfunction	ulong umask(ulong)
+link	Cfunction	int link(char *, char *)
+unlink	Cfunction	int unlink(char *)
+access	Cfunction	int access(char *, int)
+chmod	Cfunction	int chmod(char *, int)
+fchmod	Cfunction	int fchmod(int, int)
+chown	Cfunction	int chown(char *, ulong, ulong)
+fchown	Cfunction	int fchown(int, ulong, ulong)
+pathconf Cfunction	long pathconf(char *, int)
+fpathconf Cfunction	long fpathconf(int, int)
+utime	Cfunction	int utime(char *, {long, long}*)
+pipe	Cfunction	int pipe(int *)
+dup	Cfunction	int dup(int)
+dup2	Cfunction	int dup2(int, int)
+close	Cfunction	int close(int)
+fsync	Cfunction	int fsync(int)
+read	Cfunction	int read(int, char *, int)
+write	Cfunction	int write(int, char *, int)
+fcntl	Cfunction	int fcntl(int, int, int)
+lseek	Cfunction	long lseek(int, long, int)
+mkfifo	Cfunction	int mkfifo(char *, int)
+
+# FILE stream functions
+
+fclose	Cfunction	int fclose(int)
+fflush	Cfunction	int fflush(int)
+ferror	Cfunction	int Ferror(int)
+feof	Cfunction	int Feof(int)
+clearerr Cfunction	int Clearerr(int)
+fileno	Cfunction	int Fileno(int)
+fopen	Cfunction	int fopen(char *, char *)
+freopen	Cfunction	int freopen(char *, char *, int)
+fdopen	Cfunction	int fdopen(int, char *)
+popen	Cfunction	int popen(char *, char *)
+pclose	Cfunction	int pclose(int)
+fseek	Cfunction	int fseek(int, long, int)
+ftell	Cfunction	long ftell(int)
+rewind	Cfunction	int Rewind(int)
+fread	Cfunction	int fread(char *, long, long, int)
+fwrite	Cfunction	int fwrite(char *, long, long, int)
+fgetc	Cfunction	int fgetc(int)
+getw	Cfunction	int getw(int)
+fgets	Cfunction	char *fgets(char *, int, int)
+fputc	Cfunction	int fputc(char, int)
+putw	Cfunction	int putw(int, int)
+fputs	Cfunction	int fputs(char *, int)
+ungetc	Cfunction	int ungetc(int, int)
+
+# General functions
+
+kill		Cfunction	int kill(int, int)
+sleep		Cfunction	int sleep(int)
+getpid		Cfunction	int getpid()
+getppid		Cfunction	int getppid()
+getuid		Cfunction	int getuid()
+geteuid		Cfunction	int geteuid()
+getgid		Cfunction	int getgid()
+getegid		Cfunction	int getegid()
+setuid		Cfunction	int setuid(int)
+setgid		Cfunction	int setgid(int)
+seteuid		Cfunction	int seteuid(int)
+setegid		Cfunction	int setegid(int)
+#setruid		Cfunction	int setruid(int)
+#setrgid		Cfunction	int setrgid(int)
+getgroups	Cfunction	int getgroups(int, long *)
+initgroups	Cfunction	int initgroups(char *,int)
+getlogin	Cfunction	char *getlogin()
+cuserid		Cfunction	char *cuserid(char *)
+getpgrp		Cfunction	int getpgrp()
+setsid		Cfunction	int setsid()
+setpgid		Cfunction	int setpgid(int, int)
+time		Cfunction	int time(long *)
+times		Cfunction	int times({int, int, int, int}*)
+getenv		Cfunction	char *getenv(char *)
+ctermid		Cfunction	char *ctermid(char *)
+ttyname		Cfunction	char *ttyname(int)
+isatty		Cfunction	int isatty(int)
+sysconf		Cfunction	long sysconf(int)
+chdir		Cfunction	int chdir(char *)
+getcwd		Cfunction	char *getcwd(char *, int)
+poll            Cfunction	int poll({int,short,short}*, ulong, int)
+mknod		Cfunction	int mknod(char *, ulong, ulong)
+mkdir		Cfunction	int mkdir(char *, ulong)
+
+# stat intrinsics
+# using int * instead of struct stat
+# note that sizeof(struct stat) is differnet on different platforms
+# constant 'INTSIZEOFSTAT' returns proper dimension of the integer array
+stat		Cfunction	int stat(char *, int *)
+lstat		Cfunction	int lstat(char *, int *)
+fstat		Cfunction	int fstat(int, int *)
+
+#
+# memory-mapped file functions
+#
+
+mmap		Cfunction	uint Mmap(uint, int, int, int, int, uint)
+munmap		Cfunction	uint Munmap(uint, int)
+msync		Cfunction	uint Msync(uint, int, int)
+mprotect	Cfunction	uint Mprotect(uint, int, int)
+
+#
+# shared memory functions
+#
+
+shmgetexist	Cfunction	int shmgetexist(int)
+shmcreate	Cfunction	int shmcreate(int, int, int)
+shmcreatex	Cfunction	int shmcreatex(int, int, int)
+shmat		Cfunction	uint shmat(int, uint, int)
+shmdt		Cfunction	int shmdt(uint)
+shmremove	Cfunction	int shmremove(int)
+shmlock		Cfunction	int shmlock(int)
+shmset		Cfunction	int shmset(int, int, int, int)
+
+#
+# Miscellaneous functions
+#
+
+system		Cfunction	int system(char *)
+ftok		Cfunction	int ftok(char *, char)
+
+# To move date between workspace and shared memory
+# 2nd argument is in fact char *, shared memory address
+shm2ws		Cfunction	int shm2ws(char *, uint, int)
+ws2shm		Cfunction	int ws2shm(char *, uint, int)
+
+# To move date between file and shared memory
+# 2nd argument is in fact char *, shared memory address
+shm2file	Cfunction	int shm2file(int, uint, int)
+file2shm	Cfunction	int file2shm(int, uint, int)
+
+#
+# Semaphore functions
+#
+semcreate	Cfunction	int semcreate(int, int, int)
+semremove	Cfunction	int semremove(int)
+semoper         Cfunction       int semoper(int, int*, int*, int*, int)
+semget_val	Cfunction	int semget_val(int, int)
+semget_pid	Cfunction	int semget_pid(int, int)
+semget_ncount	Cfunction	int semget_ncount(int, int)
+semget_zcount	Cfunction	int semget_zcount(int, int)
+semget_stat	Cfunction	int semget_stat(int, int*, int*)
+semget_all	Cfunction	int semget_all(int, ushort*)
+semset_val	Cfunction	int semset_val(int, int, int)
+semset_perm	Cfunction	int semset_perm(int, int, int, int)
+semset_all	Cfunction	int semset_all(int, ushort*)
+
+#
+# Message Queue functions
+#
+msqcreate	Cfunction	int msqcreate(int, int)
+msqremove	Cfunction	int msqremove(int)
+msqsnd		Cfunction	int msqsnd(int, long, char*, uint, int)
+msqrcv		Cfunction	int msqrcv(int, long*, char*, uint, long, int)
+msqget_stat	Cfunction	int msqget_stat(int, int*, ulong*, long*)
+msqset_perm	Cfunction	int msqset_perm(int, int, int, int)
+
+#
+#	socket intrinsic function prototypes
+#
+socket	dynamic		$SAXDIR/lib/socket.si
+
+socket	Cfunction	int socket(int, int, int)
+bind	Cfunction	int bind(int, char*, int)
+connect	Cfunction	int connect(int, char*, int)
+listen	Cfunction	int listen(int, int)
+accept	Cfunction	int accept(int, char*, int*)
+send	Cfunction	int send(int, char*, int, int)
+recv	Cfunction	int recv(int, char*, int, int)
+shutdown Cfunction	int shutdown(int, int)
+close	Cfunction	int close(int)
+getsockopt Cfunction	int getsockopt(int, int, int, char*, int*)
+setsockopt Cfunction	int setsockopt(int, int, int, char*, int)
+recvfrom Cfunction	int recvfrom(int, char*, int, int, char*, int*)
+sendto	Cfunction	int sendto(int, char*, int, int, char*, int)
+ioctl	Cfunction	int ioctl(int, int, char*)
+fcntl	Cfunction	int fcntl(int, int, int)
+select	Cfunction	int select(int, int*, int*, int*, int*)
+getpeername Cfunction	int getpeername(int, char*, int*)
+getsockname Cfunction	int getsockname(int, char*, int*)
+
+version	Cfunction	char *Sversion(int)
+
+errno	Cfunction	int c_errno()
+genaddr	Cfunction	int c_genaddr(int, char*, char*, char*, int*)
+constants Cfunction	int c_constants(char*)
+setsigpipe Cfunction	int setsigpipe(int)
+#
+# intrinsics large file support
+#
+
+lf	dynamic		$SAXDIR/lib/lf.si
+
+lfcreate	Cfunction	int lfcreate(char *,int,int,int)
+lfresize	Cfunction	int lfresize(char *,int,int)
+lfremove	Cfunction	int lfremove(char *)
+lfopen		Cfunction	int lfopen(char *,int,int)
+lfclose		Cfunction	int lfclose(int)
+lfread		Cfunction	int lfread(int,char *,int,int)
+lfreadmem	Cfunction	int lfreadmem(int,int,int,int)
+lfwrite		Cfunction	int lfwrite(int,char *,int,int)
+lfwritemem	Cfunction	int lfwritemem(int,int,int,int)
+lffsync		Cfunction	int lffsync(int)
+
+#
+# intrinsics large file support (single file)
+#
+
+slf	dynamic		$SAXDIR/lib/slf.si
+
+slfcreate	Cfunction	int slfcreate(char *,int,int,int)
+slfresize	Cfunction	int slfresize(char *,int,int)
+slfremove	Cfunction	int slfremove(char *)
+slfopen		Cfunction	int slfopen(char *,int,int)
+slfclose	Cfunction	int slfclose(int)
+slfread		Cfunction	int slfread(int,char *,int,int)
+slfreadmem	Cfunction	int slfreadmem(int,int,int,int)
+slfwrite	Cfunction	int slfwrite(int,char *,int,int)
+slfwritemem	Cfunction	int slfwritemem(int,int,int,int)
+slffsync	Cfunction	int slffsync(int)
+
+#
+# IFs for signal blocking and unblocking
+# used by TSQ and/or others
+
+signal	dynamic		$SAXDIR/lib/signal.si
+
+# functions directly from signal.h and libc 
+# POSIX signal set manipulation functions
+sigemptyset	Cfunction	int sigemptyset(int*)
+sigfillset	Cfunction	int sigfillset(int*)
+sigaddset	Cfunction	int sigaddset(int*, int)
+sigdelset	Cfunction	int sigdelset(int*, int)
+sigismember	Cfunction	int sigismember(int*, int)
+sigsuspend	Cfunction	int sigsuspend(int*)
+sigprocmask	Cfunction	int sigprocmask(int, int*, int*)
+sigpending	Cfunction	int sigpending(int*)
+
+# higher order functions from signal.c
+sigblockexcept	Cfunction	int sigblockexcept(int, int*, int*)
+sigunblock	Cfunction	int sigunblock(int *)
+
+# these one are also in signal.c for your conviniance
+siggetmask	Cfunction	int sig_getmask(int *)
+sigblockall	Cfunction	int sigblockall(int *)
+
+# if first argument is positive, block it, otherwise unblock it
+sigblockone Cfunction	int sigblockone(int, int *)
+
+# first field is sizeof(sigset_t), the second is NSIG
+getsigconsts	Cfunction	int getsigconsts(int *)
+#
+#	java interpreter intrinsic function prototypes
+#
+java	dynamic		$SAXDIR/lib/java.si
+
+J_size	Cfunction	int J_size(char*)
+JfC	Cfunction	int JfC(char*, char*)
+C_size	Cfunction	int C_size(char*)
+CfJ	Cfunction	int CfJ(char*, char*)
+version	Cfunction	char *Sversion(int)
+
+#
+#	mpa functions
+#
+
+mpa	dynamic		$SAXDIR/lib/mpa.si
+
+div1	Cfunction	int div1(int, int*, int, int)
+divn	Cfunction	int divn(int*, int, int*, int, int*, int*, int)
+diff	Cfunction	int diff(int*, int*, int, int)
+comp	Cfunction	int comp(int*, int*, int)
+mul1	Cfunction	int mul1(int*, int, int, int*, int, int)
+mult	Cfunction	int mult(int*, int, int*, int, int*, int)
+norm	Cfunction	int norm(int*, int, int*, int, int)
+chop	Cfunction	int chop(int, int*, int)
+
+version Cfunction       char *Sversion(int)
+#
+# $Header: /usr/cvsroot/sax/src/difs/file64.saxif,v 1.1 2003/04/30 17:58:30 dragan Exp $
+#
+# Ifs for the 64 bit transitional file interface
+#
+
+file64			dynamic		$SAXDIR/lib/file64.si
+
+# int creat64()		-- no change in APL interface
+creat64		Cfunction	int creat64(char *, int)
+# int open64()		-- no change in APL interface 
+open64		Cfunction	int open64(char *, int, int)
+# FILE *fopen64()	-- no change in APL interface 
+fopen64		Cfunction	int fopen64(char *, char *)
+# FILE *freopen64()	-- no change in APL interface 
+freopen64	Cfunction	freopen64(char *, char *, int)
+# int fseeko64()	-- uses off64_t
+fseeko64	Cfunction	int Fseeko64(int, double, int)
+# off64_t ftello64()	-- uses off64_t
+ftello64	Cfunction	double Ftello64(int)
+# off64_t lseek64()	-- uses off64_t
+lseek64		Cfunction	double Lseek64(int, double, int)
+# mmap64()		-- uses off64_t
+mmap64		Cfunction	uint Mmap64(uint, int, int, int, int, double)	
+# int fstat64()		-- uses struct stat64
+fstat64		Cfunction	int fstat64(int, int *)
+# int lstat64()		-- uses struct stat64
+lstat64		Cfunction	int lstat64(char *, int *)
+# int stat64()		-- uses struct stat64
+stat64		Cfunction 	int stat64(char *, int *)
+#
+#	test dlf-style intrinsics (hybrid)
+#
+hybrid	dynamic		$SAXDIR/lib/hybrid.si
+
+TSQ_glum	intrinsic	TSQ_glum
+TSQ_tobits	intrinsic	TSQ_tobits
+TSQ_frombits	intrinsic	TSQ_frombits
+TSQ_encode	intrinsic	TSQ_encode
+TSQ_decode	intrinsic	TSQ_decode
+TSQ_strcomp	intrinsic	TSQ_strcomp
+TSQ_wildcard	intrinsic	TSQ_wildcard
+TSQ_sort	intrinsic	TSQ_sort
+TSQ_sortstats	intrinsic	TSQ_sortstats
+TSQ_translate	intrinsic	TSQ_translate
+TSQ_trim_trail	intrinsic	TSQ_trim_trail
+TSQ_trim_lead	intrinsic	TSQ_trim_lead
+TSQ_dbl_blank   intrinsic	TSQ_dbl_blank

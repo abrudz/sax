@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# arg1: client user id
+# arg2: client password
+# arg3: client processor id
+# arg4: client clone id
+# arg5: client hostname@portNumber
+# arg6: server name (optional)
+# arg7: server password (optional)
+# arg8: server processor id
+# arg9: server clone id
+# arg10: server work space name
+
+talk naughtyboy mkusick 107 999 ares@405 "" "" 107 9999 \
+/usr/sax/rel/xmpls/nsvp/ndeserver

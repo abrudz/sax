@@ -1,0 +1,23 @@
+# pc220.ini - Copyright (c) 1992, I.P. Sharp Associates
+#
+# @(#)pc220.init	1.1.1.1 92/07/06
+#
+# Initialization File for SAX System for:
+#   PC220 (part of Motorola/Locus PC-Interface package)
+#
+#    CSI prefix is \033[
+#    SSI prefix is \033O
+#
+#    See pc220.how for key definitions.
+# Function               Keystroke
+# ========               =========
+#  overstrike            Ctrl <- (backspace key)
+-o^P
+#  APL escape            F1 ("HELP")
+-Z^A
+#  Undo (discard input)  Home
+-k\033[1~
+#
+# choose special output translate table 
+#
+-O$SAXDIR/lib/term/pc220tab

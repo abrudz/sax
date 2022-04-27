@@ -1,0 +1,16 @@
+#------	Site specifiable SVP configuration parameters.
+
+#	@(#)site.svp	1.1	94/06/14
+
+#	users	- maximum number of users allowed to connect to the svp.
+#	shares	- maximum number of shared variables.
+#	size	- size of shared variable storage (k-bytes).
+#
+#	Replace the default numbers in the following assignment statement with
+#	numbers selected by your site. Values for users, shares, and size must
+#	be greater than zero and keywords and quotation marks must be retained.
+#SITE_SVP="users 10 shares 100 size 3000 ttsize 100"
+#
+# more reasonable defaults
+#
+SITE_SVP="users 100 shares 1000 size 3000 ttsize 1000"

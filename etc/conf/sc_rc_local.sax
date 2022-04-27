@@ -1,0 +1,73 @@
+#!/bin/sh
+# sc_rc_local.sax for sun cluster ipcs svp -
+# Copyright (c) 1999, 2003 Soliton Associates Limited
+#
+# $Header: /usr/cvsroot/sax/src/svp/sc_rc_local.sax,v 1.2 2003/05/23 14:57:45 dragan Exp $
+
+# syntax: sc_rc_local.sax	[ start | stop ]
+#
+# Start or stop the sax enviroment with ipcs svp.
+# It is tailored for Sun Cluster environment as it is on sc[12]
+#
+# This script must be run by root.
+#
+# For start processing the svp is configured with site specified configuration
+# parameters and and the nsvp daemon is started. For stop processing the nsvp
+# daemon is stopped and the svp is shut down.
+#
+
+die() {
+echo "$0: Can't start svp, probably not installed"
+exit 1
+}
+
+
+
+#------	Validate start/stop (default is start).
+
+sos1=${1:-start}
+
+case	$sos1 in
+	start|stop)	;;
+	*)		echo "Usage: $0 [ start | stop ]"
+			exit 1
+			;;
+esac
+
+#------	Sax base directory (default is for customer convenience).
+
+SAXDIR=/global/test/sax ; export SAXDIR
+
+# place for .svp_XXXXXX pipes
+SVPDIR=${SAXDIR}/tmp; export SVPDIR
+
+# IPC parameters: key and address
+#SVPIPCS="0x444,0xa0000000"; export SVPIPCS
+# SVPIPCS is obsolete, use SVPKEY and SVPADDR
+
+SVPKEY=0x444
+SVPADDR=0xa0000000
+export SVPKEY SVPADDR
+
+# which port does NSVP listens to
+NSVP_IPORT="-p805"	; export NSVP_IPORT	
+# print startup message to a file
+NSVPSTDOUT=${SAXDIR}/tmp/nsvp.out; export NSVPSTDOUT
+
+
+#------	Site specified SVP and NSVP configuration parameters.
+
+. $SAXDIR/etc/site.svp		# SITE_SVP
+. $SAXDIR/etc/site.nsvp		# SITE_NSVP
+
+ulimit -H -d unlimited
+
+#------	Start/stop the SVP and NSVP.
+
+if	[ $sos1 = "start" ]
+then
+	$SAXDIR/bin/svpmaint -init $SITE_SVP
+	$SAXDIR/etc/nsvp.script start $SITE_NSVP
+else
+	$SAXDIR/etc/conf/svp.stop
+fi

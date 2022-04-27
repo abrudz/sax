@@ -1,0 +1,112 @@
+# terminfo source for "pc108" support.
+# NOTE: it is very important, so long as SAX continues to use the termcap-
+# format "atermcap" file, that specifications there for pc108 match these.
+# An easy way to ensure that is to use infocmp with the -C option to produce
+# a termcap-format version of the compiled terminfo entry corresponding to
+# these specs; all but the cm (cursor movement) entry are converted correctly,
+# and the cm entry may be preserved from the previous atermcap pc108 entry.
+pc108-m|IPSA's pc108 program,
+	am, eo, eslok, hs, mir, ul, xenl, xon,
+	cols#80, lines#24, vt#8, wsl#79,
+# bold here is actually "half bright"
+	bel=^G, blink=\EC, bold=\EE, clear=\E?\E^E$<2*>, cnorm=\Ew,
+	cr=\r, cub1=\b, cud1=\n, cuf1=\E=,
+	cup=\Ea%p1%?%p1%{95}%>%t^A%{96}%-%;%'\s'%+%c%p2%?%p2%{95}%>%t^A%{96}%-%;%'\s'%+%c,
+	cuu1=\E;, cvvis=\EW, dch1=\E\s1$<16*>, dim=\EE,
+	dl1=\E^B$<3*>, ed=\E^E$<16*>,
+	el=\E^U$<16>, flash=\Ek$<20>\EK,
+	home=\E?,
+	ht=\t$<8>, il1=\E^R$<3*>, ind=\n, invis=\EH,
+	ip=$<16*>,
+#
+# is1: normal video, 80 columns, buffer overflow control on
+# is2: pgmr mode, text mode, character mode, upper/lower case, full duplex,
+#	auto linefeed off, set attribute word (unprotected), \E\200 ?,
+#	change message character (EOM) to ^M,
+#	change message character (FKID) to ^R,
+#	change message character (ACK) to \200,
+#	set insert type to "insert in line",
+#	define clear characteristics to (display, default attrs, char = \s),
+#	cursor pad transmits,
+# is3: pgmr mode
+#	select window 2; define it to 167 0 1 80; map window 2 to bg status ln
+#	select window 1; define it to 168 0 24 80 (for use by cursor-addr progs)
+#	select window 0, define it to 0 0 167 80 (normal session log)
+#	set cursor keypad to local (like rmkx)
+#	end of text, \n,
+#	set backspace key to be ^H (not ^H^J), ascii mode
+#	set backspace key to be ^H (not ^H^J), APL mode
+#	Transmit composite characters without interposed backspace
+#
+	is1=\EK\E!\E\sF,
+	is2=\EU\Ef\E7\E5\E8\El\ENH\E\200\Eo&^M\Eo'^R\Eo!\200\E^G!\E\bA@\s\EX,
+	is3=\EU
+		\E\sz"\Ev^Ag\s!p\E\s;"
+		\E\sz!\Ev^Ah\s8p
+		\E\sz\s\Ev\s\s^Agp
+		\Ep\n
+		\E\so\s!.\,\s
+		\E\so#!.\,\s
+		\E\s}B!,
+#
+# Status line stuff ...
+#	dsl (disable status line): map background sl to undefined window
+#	fsl (return from status line): Normal brightness, select window 0
+#	tsl (go to status line): Select window 2, home cursor, highlight bright
+#
+	dsl=\E\s;\177, fsl=\Ee\E\sz\s, tsl=\E\sz"\E?\EE,
+#
+# Key definitions ...
+#
+	kbs=^H, kctab=\E_, kcbt=\E', 
+	kcub1=\E>, kcud1=\E<, kcuf1=\E=, kcuu1=\E;,
+	kdch1=\177, kdl1=\E^B, ked=\E^C, kel=^E, kent=\r,
+#
+	kf1=^R5^M, kf2=^R6^M, kf3=^R7^M, kf4=^R8^M,
+	kf5=^R9^M, kf6=^R:^M, kf7=^R;^M, kf8=^R<^M,
+	kf9=^R=^M, kf10=^R>^M, kf11=^R?^M, kf12=^R@^M,
+	kf13=^RA^M, kf14=^RB^M, kf15=^RF^M, kf16=^RH^M,
+	kf17=^RJ^M, kf18=^RL^M, kf19=^RN^M, kf20=^RP^M,
+	kf21=^Rf21, kf22=^Rf22, kf23=^Rf23, kf24=^Rf24,
+# AP124 special keys, changed to use pf25-36		koji 1993-jan-7
+#
+# PA keys
+	kf25=\r,kf26=^R%^M, kf27=^R&^M, kf28=^R'^M,
+#
+# New line key, overstrike esc key, APL esc key, tab input key
+	kf29=\n, kf30=^Y, kf31=^A, kf32=\t,
+#
+# clear, dup, field mark ...
+	kclr=^R(^M, .kcpy=^R)^M, .kmrk=^R*^M,
+	kf33=^R)^M,	kf34=^R*^M,
+#
+	khome=\E?, khts=\E], kich1=^T, kil1=\E^R, kind=\E[,
+	knp=\E-, kpp=\E., kri=\E\\, krfr=^L, krmir=\E\200,
+#
+	mc4=^^o\s\E\EQ!\EYP^W, mc5=\EQ"\EY(^W\EYD\Eo\s^^,
+	nel=\r\n,
+	prot=\EI, rep=\Er%p1%c%p2%'\s'%+%c$<.2*>, rev=\ED,
+# rmcup (return from cursor-addressing mode):
+#	NOTE.  See note at smcup.
+#		programmer mode, define window 0, go to end of text, nl,
+	rmcup=\EU\Ev\s\s^Agp\Ep\r\n, 
+	rmir=\E\200,
+	rmso=\Ed, rmul=\Eg, sgr0=^O\EN\200,
+#smcup (start cursor-addressing mode): 
+#	NOTE.  For some reason simply selecting window 1 doesn't work;
+#	therefore it's redefined here (and for symmetry window 0 is treated
+#	likewise in rmcup).  A kluge, but...
+#		programmer mode, define window 1, home, left, home
+#	(the home-left-home sequence ensures the window matches
+#	the physical screen)
+#		goto end-of-text, newline
+#	(Original spec ended w goto end of text, cr, clear to end of line) 
+#		turn on cursor keypad transmit (this duplicates smkx
+#	intentionally; may only be necessary for termcap version)
+	smcup=\EU\Ev^Ah\s8p\E?\E>\E?\Ep\n\EX, 
+	smir=\E^P, smkx=\EX,
+	smso=\ED, smul=\EG,
+#
+# Alternate character support ...
+#
+	smacs=^N, rmacs=^O,

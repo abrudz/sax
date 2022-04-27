@@ -1,0 +1,23 @@
+#!/bin/sh
+# svp.stop - Copyright (c) 1999, Soliton Associates Limited
+#
+# @(#)$Header: /usr/cvsroot/sax/src/svp/svp.stop,v 1.1 2002/07/08 15:17:00 dragan Exp $
+
+warn() {
+echo "$0: warning: $1"
+}
+
+die() {
+echo "$0: Can't stop svp: $1"
+exit 1
+}
+
+SAXDIR=${SAXDIR:-/usr/sax/rel}	; export SAXDIR
+
+UNNSVP=$SAXDIR/etc/nsvp.script
+$UNNSVP stop	|| warn "$UNNSVP stop: error $?"
+
+SVPMAINT=${SAXDIR}/bin/svpmaint
+$SVPMAINT -init shutdown || die "$SVPMAINT -init shutdown: error $?"
+
+exit 0

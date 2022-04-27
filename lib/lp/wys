@@ -1,0 +1,654 @@
+#!/bin/sh 
+# UNIX script to accomodate PostScript printing
+# wys - Copyright (c) 2002, Soliton Inc.
+#
+# @(#)wys       1.1.2.14 92/08/28
+# $Header: /usr/cvsroot/sax/src/lib/lp/wys,v 1.6 2004/05/25 20:30:57 dragan Exp $
+#
+# Change History
+# 1990Mar09 glind: fix bugs.
+# 1990Jan08 glind: fix bugs.
+# 1989Nov22 glind: give the option an argument.
+# 1989Nov05 dhs: preserve file name when 'wrap' option used
+# 2000Nov14 dragan: adapted to Linux and some other changes.
+# Defaults for system wide settings
+#
+SAXDIR=${SAXDIR:-/usr/sax/rel}
+# Directory for user-configurable files
+SAXCNF=${SAXCNF:-/usr/sax/local}
+if [ ! -d $SAXCNF ]
+then
+    SAXCNF=$SAXDIR
+fi
+Dir=${Dir:-$SAXDIR/lib/lp}
+
+Trayflag=${Trayflag:-0}
+TmpDir=${TmpDir:-/var/tmp}
+Tmpflag=${Tmpflag:-0}
+File=${File:-""}
+Rmtfile=${Rmtfile:-""}
+#
+Stem=`basename "$0"`
+if test $# = 0
+then
+    cat "$Dir"/"$Stem"opts1
+    exit
+fi
+#
+# Get settings from machine directory
+#
+LIBRC=${LIBRC:-$SAXCNF/etc/"$Stem"rc}
+if test -f "$LIBRC"
+then 
+    . $LIBRC
+fi
+
+#
+# Set print tokens based on UNIX flavor of $PrintMachine
+#
+if test -f /bin/uname
+then
+    OPSYS=`/bin/uname -s`
+    case "$OPSYS" in
+	Linux)
+	    RELEASE=`/bin/uname -r`
+	    CC="-#"
+	    PN="lpr "
+	    HC="-h "
+	    PR="-P"
+	    SH="rsh"
+	    # how do you enquire the default printer? According to man page
+	    # for lpr, it uses lp if nothing is specified. Dragan
+	    Prt=${PRT:-lp}
+	    Machine=`hostname`
+	;;
+        SunOS)
+            RELEASE=`/bin/uname -r`
+            case "$RELEASE" in
+                4*) CC="-#"
+                    PN="lpr "
+                    HC="-h "
+                    PR="-P"
+                    SH="rsh"
+                    Prt=${Prt:-LW}
+                    Machine=`hostname`
+                ;;
+                5*) CC="-n"
+                    PN="lp " 
+                    HC=" "  
+                    PR="-d"
+                    SH="remsh"
+                    x=`/usr/bin/lpstat -d | /bin/awk '{print $4}'`
+                    Prt=${Prt:-$x}
+                    Machine=`hostname`
+                ;;
+                *)  echo "${Stem}: Unsupported release of SunOS."
+                    exit 1
+                ;;
+            esac
+        ;;
+        AIX)
+            RELEASE=`/bin/uname -v`
+            case "$RELEASE" in
+                3*|4*|5*)
+                    CC="-#"
+                    PN="lpr "
+                    HC="-h "
+                    PR="-P"
+                    SH="rsh"
+		    # if the printer name is > 7 char, than lpstat -d does
+		    # not return the full name (enq -W does) but there is
+		    # no -W option in 3.x. Dragan
+		    case "$RELEASE" in
+			4*|5*)
+			    x=`/bin/enq -W | /bin/awk '{ if (NR == 3) print $1}'`
+			;;
+			3*)
+			    x=`/bin/lpstat -d | /bin/awk '{ if (NR == 3) print $1}'`
+			;;
+		    esac
+                    Prt=${Prt:-$x}
+                    Machine=`hostname`
+                ;;
+                *)  echo "${Stem}: Unsupported version of AIX."
+                    exit 1
+                ;;
+            esac
+        ;;
+        *)
+            echo "${Stem}: ${OPSYS}: Unsupported operating system"
+            exit 1
+        ;;
+    esac
+else
+    echo "${Stem}: /bin/uname: No such file or directory"
+    exit 2
+fi
+
+PrintMachine=${PrintMachine:-$Machine}
+PrintSpool=${PrintSpool:-$PN}
+#
+# Defaults for options
+#
+BGflag=${BGflag:-0}             # -b
+Copy=${Copy:-1}                 # -c
+Charff=${Charff:-@}             # -C
+Font=${Font:-/APLitalic}        # -f
+Filecov=${Filecov:-0}           # -F
+Headflag=${Headflag:-7}         # -h
+Head=${Head:-$LOGNAME@$Machine} # -H
+Jobcov=${Jobcov:-0}             # -j
+Landscape=${Landscape:-0}       # -l
+Lines=${Lines:-99999}           # -L
+Message=${Message:-0}           # -m
+Newpage=${Newpage:-0}           # -n
+Name=${Name:-""}                # -N
+Outfile=${Outfile:-""}          # -o
+Points=${Points:-10}            # -p
+Pagenr=${Pagenr:-1}             # -P
+Req=${Req:-/dev/null}           # -r
+Remove=${Remove:-0}             # -R
+STSCflag=${STSCflag:-0}         # -s
+Startpg=${Startpg:-1}           # -S
+Tabs=${Tabs:-8}                 # -t
+Verbose=${Verbose:-1}           # -v
+Wrap=${Wrap:-0}                 # -w
+Wrapl=${Wrapl:-0}               # -W
+Wrapc=${Wrapc:-"\\"}            # -x
+Wrapi=${Wrapi:-6}               # -y
+#
+# Get settings from private directory
+#
+RC=${RC:-$HOME/."$Stem"rc}
+if test -f "$RC"
+   then 
+        . $RC
+fi
+
+if test $Machine != $PrintMachine
+   then Rmtfile=$TmpDir/W$$
+fi
+#
+# Analyse parameters 
+#
+TMP=$TmpDir/$Stem$$
+set -- `/usr/bin/getopt b:c:d:f:h:ij:l:m:n:o:p:r:s:t:v:w:x:y:C:F:H:L:N:P:R:S:W:q $*`
+if [ $? != 0 ]
+then
+        cat $Dir/"$Stem"opts 
+        exit
+fi
+while [ $1 != -- ]
+do  
+        case $1 in
+        -b)BGflag=$2; shift ;;
+        -c)Copy=$2; shift ;;
+        -C)Charff=$2; shift ;;
+        -d)Prt=$2; shift ;;
+        -f)Font=$2; shift ;;
+        -F)Filecov=$2; shift ;;
+        -h)Headflag=$2; shift ;;
+        -H)Head=$2; shift ;;
+        -i)read Ar; 
+                while test -n "$Ar";
+                        do
+                                File=$File' '$Ar;
+                                read Ar; 
+                        done;;
+        -j)Jobcov=$2; shift ;;
+        -l)Landscape=$2; shift ;;
+        -L)Lines=$2; shift ;;
+        -m)Message=$2; shift ;;
+        -n)Newpage=$2; shift ;;
+        -N)Name=$2; shift ;;
+        -o)Outfile=$2; shift ;;
+        -p)Points=$2; shift ;;
+        -P)Pagenr=$2; shift ;;
+        -r)Req=$2; shift ;;
+        -R)Remove=$2; shift ;;
+        -s)STSCflag=$2; shift ;;
+        -S)Startpg=$2; shift ;;
+        -t)Tabs=$2; shift ;;
+        -v)Verbose=$2; shift ;; 
+        -w)Wrap=$2; shift ;;
+        -W)Wrapl=$2; shift ;;
+        -x)Wrapc=$2; shift ;;
+        -y)Wrapi=$2; shift ;;
+
+        -q)cat $Dir/"$Stem"opts ; exit ;;
+        -*)cat $Dir/"$Stem"opts ; exit ;;
+        esac
+        shift
+done
+shift # shift past "--" from getopt
+#
+if test "$#" = 1 -a "$1" = "-"
+   then
+        cat > $TMP
+elif test $# -gt 0 
+     then
+        for f
+        do
+                if test $f = "-"
+                   then
+                        error
+                fi
+        done
+        File=$File" "$*
+fi
+#
+# Is there anything to print?
+#
+File=${File:-""}
+if test -z "$File"
+   then if test ! -s "$TMP"
+           then if test "$Verbose" = 1
+                   then echo "No file to print" 
+                        cat $Dir/"$Stem"opts1
+                fi
+                exit
+           else Tmpflag=1               
+                File=$TMP
+        fi
+fi
+if test -z "$File"
+   then if test "$Verbose" = 1
+           then echo "No files to print"
+        fi
+        exit
+fi
+
+#
+# Check parameters with restricted values.
+#
+case "$Verbose" in
+        0);;
+        1);;
+        *)
+        echo "Invalid parameter value for -v (Verbose), used 1"
+        Verbose=1
+        ;;
+esac
+
+case "$Headflag" in
+        0);;
+        1);;
+        2);;
+        3);;
+        4);;
+        5);;
+        6);;
+        7);;
+        *)
+        if test "$Verbose" = 1
+           then echo "Invalid parameter value for -h (Headflag), used 7"
+        fi
+        Headflag=7
+        ;;
+esac
+
+case "$Jobcov" in
+        0);;
+        1);;
+        2);;
+        3);;
+        *)
+        if test "$Verbose" = 1
+           then echo "Invalid parameter value for -j (Jobcov), used 0"
+        fi
+        Jobcov=0
+        ;;
+esac
+
+case "$Remove" in
+        0);;
+        1);;
+        *)
+        if test "$Verbose" = 1
+           then echo "Invalid parameter value for -R (Remove), used 0"
+        fi
+        Remove=0
+        ;;
+esac
+
+case "$Wrap" in
+        0);;
+        1);;
+        *)
+        if test "$Verbose" = 1
+           then echo "Invalid parameter value for -w (Wrap), used 0"
+        fi
+        Wrap=0
+        ;;
+esac
+
+case "$Landscape" in
+        0);;
+        1);;
+        *)
+        if test "$Verbose" = 1
+           then echo "Invalid parameter value for -l (Landscape), used 0"
+        fi
+        Landscape=0
+        ;;
+esac
+
+case "$Newpage" in
+        0);;
+        1);;
+        *)
+        if test "$Verbose" = 1
+           then echo "Invalid parameter value for -n (Newpage), used 0"
+        fi
+        Newpage=0
+        ;;
+esac
+
+case "$Message" in
+        0);;
+        1);;
+        *)
+        if test "$Verbose" = 1
+           then echo "Invalid parameter value for -m (Message), used 0"
+        fi
+        Message=0
+        ;;
+esac
+
+case "$Pagenr" in
+        0);;
+        1);;
+        *)
+        if test "$Verbose" = 1
+           then echo "Invalid parameter value for -p (Pagenr), used 1"
+        fi
+        Pagenr=1
+        ;;
+esac
+
+case "$STSCflag" in
+        0);;
+        1);;
+        2);;
+        *)
+        if test "$Verbose" = 1
+           then echo "Invalid parameter value for -s (STSCflag), used 0"
+        fi
+        STSCflag=0
+        ;;
+esac
+
+case "$Filecov" in
+        0);;
+        1);;
+        2);;
+        3);;
+        *)
+        if test "$Verbose" = 1
+           then echo "Invalid parameter value for -F (Filecov), used 0"
+        fi
+        Filecov=0
+        ;;
+esac
+
+case "$BGflag" in
+        0);;
+        1);;
+        *)
+        if test "$Verbose" = 1
+           then echo "Invalid parameter value for -b (BGflag), used 0"
+        fi
+        BGflag=0
+        ;;
+esac
+
+if test "$Copy" -lt 1
+   then if test "$Verbose" = 1
+           then echo "Invalid parameter value for -c (Copy), used 1"
+        fi
+        Copy=1
+fi
+#
+# Init nr of copies for wyswyg.
+#
+Copies=$Copy
+
+if test "$Startpg" -le 0
+   then if test "$Verbose" = 1
+           then echo "Invalid parameter value for -S (Startpg), used 1"
+        fi
+        Startpg=1
+fi
+
+if test "$Lines" -le 0
+   then if test "$Verbose" = 1
+           then echo "Invalid parameter value for -L (Lines), used 99999"
+        fi
+        Lines=99999
+fi
+
+if test "$Tabs" -lt 0
+   then if test "$Verbose" = 1
+           then echo "Invalid parameter value for -t (Tabs), used 8"
+        fi
+        Tabs=8
+fi
+
+if test "$Wrapl" -lt 0
+   then if test "$Verbose" = 1
+           then echo "Invalid parameter value for -W (Wrapl), used default"
+        fi
+fi
+
+if test "$Wrapl" -le 0
+   then if test "$Landscape" = 0
+           then Wrapl=80;
+           else Wrapl=132;
+        fi
+fi
+
+if test "$Wrapi" -lt 0
+   then if test "$Verbose" = 1
+           then echo "Invalid parameter value for -W (Wrapi), used 0"
+        fi
+        Wrapi=0
+fi
+
+if test "$Points" -le 0
+   then if test "$Verbose" = 1
+           then echo "Invalid parameter value for -p (Points), used 10"
+        fi
+        Points=10
+fi
+
+#
+# Present the list of files to the printer
+#
+export Head Font Points Dir Trayflag Filecov Jobcov Stem
+export Headflag Copy Prt Wrapl Wrapi Wrapc Landscape Outfile Rmtfile
+export Verbose Req STSCflag Tabs Wrap BGflag Message Pagenr Name
+export Newpage Lines Charff Startpg Remove
+
+set $File
+k=$#
+j=1
+for i in $File
+do
+#
+# restore Copy, because nr of copies can be set in wyswyg.
+#
+        Copy=$Copies
+
+#
+# Weed out object, ws, bss files; and scripts in UCB
+#
+        x=`file $i | cut -d: -f2 | egrep -n 'text|data|[Ss]cript|shell' |
+	    cut -d: -f1`
+
+        if test "$x" -ne 1
+           then
+                if test "$Verbose" = 1
+                   then echo "File "$i" non-printable for PostScript"
+                fi
+                Message=0
+                export Message
+                continue
+           else
+                if test "$Verbose" = 1
+                   then echo "Preparing "$i" for PostScript"
+                fi
+        fi
+
+        Tmp=$TmpDir'/T'$$'.'$j 
+        export Tmp i
+#
+# Beginning job cover to prepare?
+#
+        if test "$j" = 1 -a "$Jobcov" = 1 -o "$Jobcov" = 3
+           then $Dir/$Stem'cov' 0 0
+        fi      
+#
+# Beginning file cover to prepare?
+#
+        if test "$Filecov" = 1 -o "$Filecov" = 3
+           then $Dir/$Stem'cov' 1 0
+        fi      
+#
+# Now the file itself
+#
+# Test if file is already PostScript.
+# This is done by testing the first 2 characters. %! is the characteristics
+# of which each Postscript file starts. We found out that sometimes the file
+# has an extra ^D(\004) in front of it, so we test on that too.
+#
+        x=`dd if=$i count=2 ibs=1 2>/dev/null`
+        y=`dd if=$i count=3 ibs=1 2>/dev/null| tr "\004@" "@%"`
+        if test "$x" = "%!" -o "$y" = "@%!"
+           then
+                cat $i >> $Tmp
+           else
+                #
+                # File is not PostScript.
+                #
+                x=$Dir'/'$Stem'wyg'
+                x="$x -p $Points -h $Headflag -t $Tabs -s $STSCflag -w $Wrap"
+                x="$x -y $Wrapi -W $Wrapl -n $Newpage -L $Lines -C $Charff"
+                x="$x -S $Startpg -l $Landscape -P $Pagenr -c $Copies"
+                #
+                # init Copy, because nr of copies set in wyswyg.
+                #
+                Copy=1
+
+                if test "$Font" != ""
+                   then x="$x -f $Font"
+                fi
+
+                if test "$Charff" != "\\"
+                   then x="$x -C $Charff"
+                   else x="$x -C \\\\"
+                fi
+
+                if test "$Wrapc" != ""
+                   then if test "$Wrapc" != "\\"
+                           then x="$x -x $Wrapc"
+                           else x="$x -x \\\\"
+                        fi
+                fi
+
+                if test "$Head" != ""
+                   then x=$x" -H "'"'$Head'"'
+                fi
+
+                if test "$Name" != ""
+                   then x=$x" -N "'"'$Name'"'
+                fi
+        #
+        # Add the option termination ("--") after the LAST parameter !!!!!!!
+        #
+        # Create the printfile
+        #
+                eval $x " -- " $i >> $Tmp
+
+        fi
+
+        if test ! -s $Tmp
+           then 
+                if test "$Verbose" = 1
+                   then echo $Stem: "No output produced"
+                fi
+                Message=0
+                export Message
+                continue
+        fi
+#
+# Ending file cover?
+#
+        if test "$Filecov" = 2 -o "$Filecov" = 3
+           then $Dir/$Stem'cov' 1 1
+        fi
+#
+# Ending job cover?
+#
+        if test "$j" = "$k"
+           then if test "$Jobcov" = 2 -o "$Jobcov" = 3
+                   then $Dir/$Stem'cov' 0 1
+             fi
+        fi
+#
+# Finished for this file.
+#
+        if test -z "$Rmtfile" -a -z "$Outfile"
+           #
+           # No specifications for Rmtfile or Outfile.
+           #
+           then x="$PN $CC$Copy $PR$Prt $HC"
+                 if test "$BGflag" = 1
+                    then (nice nohup cat $Tmp| $x >> $Req; /bin/rm -f $Tmp)&
+                    else if test "$Verbose" = 1
+                            then cat $Tmp | $x; /bin/rm -f $Tmp
+                            else cat $Tmp | $x >/dev/null;/bin/rm -f $Tmp
+                         fi
+                 fi
+           else if test -n "$Outfile"
+                   #
+                   # Specifications for Outfile.
+                   #
+                   then if test "$j" = 1
+                           then mv $Tmp $Outfile
+                           else cat $Tmp >>$Outfile
+                        fi
+                        if test "$Verbose" = 1
+                           then echo $i "written to "$Outfile
+                        fi
+                   #
+                   # Specifications for Rmtfile.
+                   #
+                   else x="$Rmtfile"."$j" 
+                        if test "$Verbose" = 1
+                           then echo $i "written to "$Tmp
+                                echo "Copying "$Tmp" to "$PrintMachine":"$x
+                        fi               
+                        rcp $Tmp "$PrintMachine":"$x"
+                        rm $Tmp
+                        ($SH $PrintMachine cat $x \
+                                \| $PN $HC ${CC}$Copy $PR$Prt\; rm $x)
+                fi
+        fi
+        j="`expr $j + 1`"
+done
+#
+# Cleaning up
+#
+/bin/rm -f $TmpDir'/T'$$'*'
+
+if test "$Remove" = 1
+   then /bin/rm -f $File
+fi
+
+if test "$Tmpflag" = 1
+   then /bin/rm -f $TMP
+fi
+
+if test "$Message" = 1
+   then echo "--30--" 
+fi

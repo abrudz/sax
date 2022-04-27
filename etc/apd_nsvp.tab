@@ -1,0 +1,14 @@
+# apd_nsvp.tab -  Copyright (c) 2000, Soliton Associates Limited
+#
+#
+# System NSVP boot table for APDaemon
+#
+# This file defines what APs are started when someone logs in via NSVP.
+#
+
+.SAXDIR=/usr/sax/rel
+
+1:	$SAXDIR/bin/apl $WSSIZE -L1$SAXDIR/lib/wss -L6$SAXDIR/lib/wss6  -L8$SAXDIR/lib/wss8 -L32$SAXDIR/lib/wss32 -P%APID,-1 -Q%NSOX,%OAPID,%OCID,%POX,%NAME -W
+
+11:	$SAXDIR/bin/hostap -i%APID,%CID -r%NSOX,%OAPID,%OCID,%POX,%NAME
+

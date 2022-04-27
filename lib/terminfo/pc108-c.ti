@@ -1,0 +1,315 @@
+# pc108-c.ti - Copyright (c) 1992, I.P. Sharp Associates
+#
+# @(#)pc108-c.ti	1.1.1.6 93/01/19
+#
+pc108-c|IPSA's pc108 program with color attributes,
+# bold, blink, and underline are used in combinations to get the various
+# colors. Therefore they are "nulled" out here. File pc108-c.attr turns this
+# facility on.
+#
+# non-flicker version for full-screen use---overlays smcup (fullscreen)
+# window and top of rmcup (ordinary session log) window, to avoid flicker.
+# cost is fullscreen output destroys memory of previous Unix output.
+# pc108-m segregates the two at the cost of "flicker".
+#
+# NOTE: it is very important, so long as SAX continues to use the termcap-
+# format "atermcap" file, that specifications there for pc108 match these.
+# An easy way to ensure that is to use infocmp with the -C option to produce
+# a termcap-format version of the compiled terminfo entry corresponding to
+# these specs; all but the cm (cursor movement) entry are converted correctly,
+# and the cm entry may be preserved from the previous atermcap pc108 entry.
+#
+# This file is intended to be a guide for writing your own Terminfo
+# description. It lists every definition used by STIF, although not all
+# may be defined for this particular terminal.
+#
+#######################################################################
+#
+# Various status flags ...
+#
+# lines: number of lines
+# cols: number of columns
+# pad: pad character (rather than null)
+# xenl: newline ignored after 80 columns
+# mir: safe to move in insert mode
+# bw: auto left margin
+# am: auto right margin
+# km: terminal has a meta key
+# da: display may be retained above the screen
+# db: display may be retained below the screen
+# eo: space erases overstrikes
+# os: terminal overstrikes
+#
+# NOTE: if you specify "os", you must also specify "eo" for vi to work.
+#
+	cols#80, lines#24,
+	xenl, mir, bw, am, os, eo,
+#	xenl, mir, bw, am,
+#
+# Initialization and termination stuff ...
+#
+# is1: initialization string 1
+# is2: initialization string 2
+# is3: initialization string 3
+# if: initialization file
+# iprog: initialization program
+# rs1: reset terminal string1 (not used by STIF)
+# rs2: reset terminal string2 (not used by STIF)
+# rs3: reset terminal string3 (not used by STIF)
+#
+# is1: normal video, 80 columns, buffer overflow control on
+# is2: pgmr mode, text mode, character mode, upper/lower case, full duplex,
+#	auto linefeed off, set attribute word (unprotected), \E\200 ?,
+#	change message character (EOM) to ^M,
+#	change message character (FKID) to ^R,
+#	change message character (ACK) to \200,
+#	set insert type to "insert in line",
+#	define clear characteristics to (display, default attrs, char = \s),
+#	cursor pad transmits,
+# is3: pgmr mode
+#	select window 2; define it to 167 0 1 80; map window 2 to bg status ln
+#	select window 0, define it to 0 0 24 80 (normal session log)
+#	set cursor keypad to local (like rmkx)
+#	end of text, \n,
+#	set backspace key to be ^H (not ^H^J), ascii mode
+#	set backspace key to be ^H (not ^H^J), APL mode
+#	Transmit composite characters without interposed backspace
+#
+#
+	is1=\EK\E!\E\sF,
+	is2=\EU\Ef\E7\E5\E8\El\ENH\E\200\Eo&^M\Eo'^R\Eo!\200\E^G!\E\bA@\s\EX,
+	is3=\EU
+		\E\sz"\Ev^Ag\s!p\E\s;"
+		\E\sz\s\Ev\s\s8p
+		\Ep\n
+		\E\so\s!.\,\s
+		\E\so#!.\,\s
+		\E\s}B!,
+#
+#
+# Cursor motion commands ...
+#
+# smcup: to be sent before using "cup" (cursor motion)
+# rmcup: ends programs that use "cup"
+# cup: move cursor to given row, column
+# cub1: move cursor left 1 position
+# cuf1: move cursor left 1 position
+# cuu1: move cursor left 1 position
+# cud1: move cursor left 1 position
+# cub: move cursor left n positions
+# cuf: move cursor left n positions
+# cuu: move cursor left n positions
+# cud: move cursor left n positions
+# home: move cursor to top left corner
+# nel: newline (cr, lf)
+# cr: move cursor to column 1
+# ht: tab to next 8 space tab stop
+# ind: scroll text up 1 line
+# ri: scroll text down 1 line
+#
+# smcup (start cursor-addressing mode): 
+#	programmer mode, 
+#	(Original spec ended w goto end of text, cr, clear to end of line) 
+#	turn on cursor keypad transmit (this duplicates smkx
+#		intentionally; may only be necessary for termcap version)
+#
+	smcup=\EU\EX, 
+#
+# rmcup (return from cursor-addressing mode):
+#	programmer mode, go to end of text, cr, erase-eol
+#
+	rmcup=\EU\Ep\r\E^S, 
+#
+	cup=\Ea%p1%?%p1%{95}%>%t^A%{96}%-%;%'\s'%+%c%p2%?%p2%{95}%>%t^A%{96}%-%;%'\s'%+%c,
+	cub1=\b, cuf1=\E=, cuu1=\E;, cud1=\n,
+	home=\E?, nel=\r\n, cr=\r, ht=\t$<8>,
+#
+# "ind" must be linefeed for vi to work, "ri" is therefore undefined
+#
+	ind=\n,
+#
+# Attributes ...
+#
+# sgr: set all attributes with one command
+# sgr0: turn all attributes off
+# blink: turn blinking on
+# bold: high intensity
+# rev: reverse video
+# dim: half bright (not used by STIF)
+# invis: invisable (zero intensity) (not used by STIF)
+# smul: underline
+# rmul: exit underline mode (not used by STIF)
+# smacs: alternate character set (not used by STIF)
+# rmacs: exit alternate character set mode (not used by STIF)
+#
+# NOTE: bold here is actually hds108's "half bright", it appears as bold though.
+#
+	sgr0=^O\EN\200,
+	blink=\EC, bold=\EE, rev=\ED, invis=\EH,
+	smul=\EG, rmul=\Eg,
+	smacs=^N, rmacs=^O,
+#
+# Editing commands ...
+#
+# dch1: delete 1 character
+# dch: delete n characters (not used by STIF)
+# dl1: delete 1 line
+# dl: delete n lines (not used by STIF)
+# ich1: insert 1 blank character
+# ich: insert n blank characters (not used by STIF)
+# ip: insert padding after character inserted
+# il1: insert 1 blank line
+# il: insert n blank lines (not used by STIF)
+# clear: clear the screen, cursor to top left corner
+# el: erase to end of line
+# ed: erase to end of display
+# smir: insert mode on
+# rmir: insert mode off
+#
+	dch1=\E\s1$<16*>,
+	dl1=\E^B$<3*>,
+	ip=$<16*>,
+	il1=\E^R$<3*>,
+	clear=\E?\E^E$<2*>, el=\E^U$<16>, ed=\E^E$<16*>,
+	smir=\E^P, rmir=\E\200,
+#
+# Miscellaneous terminal commands ...
+# bel: sound the alarm!
+# flash: visible bell (used if terminal doesn't have an audible bell)
+# civis: make cursor invisible
+# cnorm: make cursor visible
+# cvvis: make cursor very visible
+#
+	bel=^G,
+	flash=\Ek$<20>\EK,
+	cnorm=\Ew, cvvis=\EW,
+#
+# Status line ...
+# hs: flag indicating terminal has a status line
+# wsl: width of status line
+# dsl: disable status line (not used by STIF)
+# tsl: move cursor to column 1 of status line
+# fsl: restore cursor from status line
+#
+# NOTE:	dsl: map background sl to undefined window
+#	tsl: Select window 2, home cursor, highlight bright
+#	fsl: Normal brightness, select window 0
+#
+	hs, wsl#79, dsl=\E\s;\177, .tsl=\E\sz"\E?\EE, fsl=\Ee\E\sz\s,
+#
+########################################################################
+#
+# Keyboard definitions ...
+#
+# kent: enter
+# kbs: backspace
+# kcbt: back tab (kbtab for SYSIBM6K)
+# kcub1: left
+# kcuf1: right
+# kcuu1: up
+# kcud1: down
+# khome: home
+# kend: end
+# kdch1: delete character
+# kich1: insert toggle
+# kdl1: delete line key
+# kil1: insert line key
+# kclr: clear
+# kel: erase to end of line (field)
+# ked: erase to end of screen (not used by STIF)
+# krfr: refresh
+# kri: scroll up
+# kind: scroll down
+# kpp: page up
+# knp: page down
+# kcpy: copy (AP124 dup)
+# kmrk: mark (AP124 field mark)
+#
+	kent=\r,
+	kbs=^H, kcbt=\E', kbtab=\E',
+	kcub1=\E>, kcuf1=\E=, kcuu1=\E;, kcud1=\E<,
+	khome=\E?,
+	kdch1=\177, kich1=^T,
+	kdl1=\E^B, kil1=\E^R,
+#
+	kclr=^R(^M, kel=^E, ked=\E^C,
+	krfr=^L,
+	kri=\E\\, kind=\E[,
+	kpp=\E., knp=\E-,
+	kcpy=^R)^M, kmrk=^R*^M,
+#
+#
+# All PF keys are defined here (1-24).
+#
+	kf1=^R5^M, kf2=^R6^M, kf3=^R7^M, kf4=^R8^M,
+	kf5=^R9^M, kf6=^R:^M, kf7=^R;^M, kf8=^R<^M,
+	kf9=^R=^M, kf10=^R>^M, kf11=^R?^M, kf12=^R@^M,
+	kf13=^RA^M, kf14=^RB^M, kf15=^RF^M, kf16=^RH^M,
+	kf17=^RJ^M, kf18=^RL^M, kf19=^RN^M, kf20=^RP^M,
+	kf21=^Rf21, kf22=^Rf22, kf23=^Rf23, kf24=^Rf24,
+#
+# Terminfo doesn't have definitions for the following, so I've used kf25 - 34:
+#	changed to use pfkeys 25 - 34		koji 1993-jan-5
+# kf25: enter2
+# kf26: pa1
+# kf27: pa2
+# kf28: pa3
+# kf29: newline
+# kf30: overstrike
+# kf31: alt char (APL toggle)
+# kf32: tab
+# kf33: copy
+# kf34: mark
+#
+	kf25=\r,kf26=^R%^M, kf27=^R&^M, kf28=^R'^M,
+	kf29=\n, kf30=^P, kf31=^A, kf32=\t,
+#
+# Miscellaneous and potentially useful keys:
+#
+# khlp: help
+# kcmd: command
+# kprt: print
+#
+#######################################################################
+#
+# That's it for STIF required definitions. The remaining are here for
+# other programs that require them.
+#
+# Enter/exit standout mode ...
+#
+	smso=\ED, rmso=\Ed,
+#
+# Terminal uses xon/xoff ...
+#
+	xon,
+#
+# Escape ok in status line ...
+#
+	eslok,
+#
+# Virtual terminal number (???) ...
+#
+	vt#8,
+#
+# Printer on/off ...
+#
+	mc4=^^o\s\E\EQ!\EYP^W, mc5=\EQ"\EY(^W\EYD\Eo\s^^,
+#
+# Enter protected mode ...
+#
+	prot=\EI,
+#
+# Repeat char #1 #2 times ...
+#
+	rep=\Er%p1%c%p2%'\s'%+%c$<.2*>,
+#
+# Enter/exit keypad transmit mode ...
+#
+	smkx=\EX,
+# DISABLED to keep cursor keypad on even after using e.g. vi from hostap:
+# rmkx=\Ex,
+#
+#pc108-c specifics
+#
+	if=/usr/sax/rel/lib/terminfo/pc108-c.attr,
+	blink=\200, bold=\200, smul=\200,

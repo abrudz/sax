@@ -1,0 +1,16 @@
+# ansi.init - Copyright (c) 2001, Soliton Associates Limited
+#
+# @(#)ansi.init	1.1.1.2 93/02/01
+#
+# Initialization file for SAX for saxterm 
+#
+# Initialization of terminal:
+#
+# reset cursor key application mode
+#
+# APL escape Ctrl-A:
+-Z^A
+# APL overstrike Ctrl-P:
+-o^P
+# output table
+-O$SAXDIR/lib/term/Xotab.full

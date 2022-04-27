@@ -1,0 +1,239 @@
+#!/bin/sh
+# nsvp.script - Copyright (c) 2002, Soliton Inc.
+#
+# @(#)nsvp.script	1.1.1.5 94/04/28
+
+#######################################################################
+# DLF Feb/09/00
+# nsvp.script stop no longer takes pid argument
+# instead, svpmaint -kill is used to kill the nsvp daemon
+# nsvp.script status use svpdump -proc to find out if daemon is running 
+# LDB, Feb/18/98
+# A new argument 'status' is added to show PIDs of nsvpd instances
+#
+# The error logger is retired, all output will go into $NSVPSTDOUT
+# For debugging purposes an extensive tracing can be turned on
+#
+# A flag -z supposed to be used with a 'start' option to supply
+# path/apd.tab, had not been used. A flag -x has been used instead,
+# it requires two paths supplied as one parameter string:
+# path/apd and path/apd.tab. A flag -z has been retired.
+#
+#######################################################################
+#
+# SAX network shared variable processor (NSVP) daemon control script.
+# syntax:
+#	nsvp.script start
+#		[ -a path/nsvpd ]
+#		[ -c path/nsvp ]
+#		[ -e | +e ]
+#		[ -f path/nsvp.hosts ]
+#		[ -g alternate:host@port -g ... ]
+#		[ -i svpid ]
+#		[ -p iport ]
+#		[ -s path/nsvp.shells ]
+#		[ -t gh_timeout ] 
+#		[ -w wssize ]
+#		[ -x path/apd and path/apd.tab ]
+#		[ -1 path/stdout ]
+#
+#	nsvp.script stop
+#
+#	nsvp.script status
+#
+# Flags are only applicable to the start option but are tolerated for
+# the stop option. Any invalid flags will cause either option to fail.
+# All flags are optional with defaults provided as listed below.
+#
+# For flags requiring additional arguments white space is allowed but
+# not required (ie: -cpath/name or -c path/name).
+#
+# In the following flag description table the indicated markers are
+# used to define the type of flag and its argument requirements:
+#
+#   '#' indicates flags that can be specified more than once with
+#	each instance of the flag having a required argument.
+#
+#   '+' indicates flags used as switches (without arguments) that
+#	can be turned on using a - or off using a +.
+# 
+#   ' '	Flags not marked should be specified only once and require
+#	an argument.
+#
+#	With the exception of the multiple type '#' flags, only the
+#	last occurrence of a flag or option that is specified more
+#	than once is retained.
+#
+# -a	Path name of the executable binary for the nsvp daemon process.
+# -c	Path name of the executable binary for the nsvp child process.
+# -e +	If switched on, reference /etc/hosts.equiv when passwords
+#       omitted.
+# -f	Path name for list of alternate route names for hosts in
+#       /etc/hosts
+# -g #	Alias route name to a single host "alias_name:real_name@ip_port"
+# -i	NSVP shared variable processor id.
+# -p	NSVP internet port number.
+# -s	Path name for list of shell programs recognized as valid.
+# -t	Timeout in seconds for gettimedhostbyname()
+# -w	workspace size for ap1 (stask).
+# -x	Path name for ap daemon executable binary process plus
+# 	Path name for list of valid ap's and their parameters.
+# -1	Path name for output.
+
+SAXDIR=${SAXDIR:-/usr/sax/rel}	# system view of sax root dir for apd.
+export SAXDIR
+
+#	LDB, Jun/25/98
+#	SYS definition added since it may be undefined at run time,
+#	when needed for PSE variable definition (see line 166)
+#
+SYS=`$SAXDIR/bin/sys -s`	# system O/S type (local use only).
+SYSI=`$SAXDIR/bin/sys -i`	# system O/S name (local use only).
+
+
+# defaults
+#
+NSVPDAEMON="$SAXDIR/bin/nsvpd"			# -a
+NSVP_CNSVP="$SAXDIR/bin/nsvp"			# -c
+NSVP_EQUIV="-e"					# -e
+NSVP_HOSTS="-f$SAXDIR/etc/nsvp.hosts"		# -f 
+NSVP_AHOST=""					# -g
+NSVP_SVPID="-i13"				# -i
+NSVP_IPORT=${NSVP_IPORT:="-p405"}				# -p
+NSVP_SHELL="-s$SAXDIR/etc/nsvp.shells"		# -s
+NSVP_WSIZE=${WSSIZE:-500000}			# -w
+NSVPOPTION=""
+NSVP_APDAP="$SAXDIR/bin/apd"			# -x
+NSVP_APTAB="$SAXDIR/etc/apd_nsvp.tab"		# -x
+NSVP_APDAPTAB="$NSVP_APDAP $NSVP_APTAB"		# -x
+NSVP_TIMEOUT=${NSVP_TIMEOUT:-30}			# -t
+NSVPSTDOUT=${NSVPSTDOUT:="/dev/console"}	# -1
+
+APL_TRACE=${APL_TRACE:="$SAXDIR/trc"}
+export APL_TRACE
+_usage_error()
+{
+	USAGE="$0: invalid/missing flag, argument or option\n\
+usage: $0\n\
+\tstart\t[ -a path/nsvpd ]\n\
+\t\t[ -c path/nsvp ]\n\
+\t\t[ -f path/nsvp.hosts ]\n\
+\t\t[ -g alternate:host@port -g ... ]\n\
+\t\t[ -i svpid ]\n\
+\t\t[ -p iport ]\n\
+\t\t[ -s path/nsvp.shells ]\n\
+\t\t[ -t gh_timeout ]\n\
+\t\t[ -w wssize ]\n\
+\t\t[ -x path/apd path/apd.tab ]\n\
+\t\t[ -1 path/stdout ]\n\
+\tstatus\n\
+\tstop"
+	echo "$USAGE" >>$NSVPSTDOUT
+	exit 1
+}
+
+_shift_chk()
+{
+	if [ ! $# -gt 1 ] ; then _usage_error $* ; fi
+}
+
+case $SYS in
+	SYSSUN | SYSS386I)
+		PSE='/bin/ps -ax'
+		;;
+	IX86)
+		PSE='/bin/ps ax'
+		;;
+	*)
+		PSE='/bin/ps -e'
+		;;
+esac
+
+PID=
+
+while [ $# != 0 ]
+do
+	case $1 in
+
+	-a)	NSVPDAEMON=$2 ; _shift_chk $* ; shift ;;
+	-a*)	NSVPDAEMON=`expr "$1" : '-a\(.*\)'` ;;
+
+	-c)	NSVP_CNSVP=$2 ; _shift_chk $* ; shift ;;
+	-c*)	NSVP_CNSVP=`expr "$1" : '-c\(.*\)'` ;;
+
+	-e)	NSVP_EQUIV="-e" ;;
+	+e)	NSVP_EQUIV="" ;;
+
+	-f)	NSVP_HOSTS="-f"$2 ; _shift_chk $* ; shift ;;
+	-f*)	NSVP_HOSTS="-f"`expr "$1" : '-f\(.*\)'` ;;
+
+	-g)	NSVP_AHOST="$NSVP_AHOST -g"$2 ; _shift_chk $* ; shift ;;
+	-g*)	NSVP_AHOST="$NSVP_AHOST -g"`expr "$1" : '-g\(.*\)'` ;;
+
+	-i)	NSVP_SVPID="-i"$2 ; _shift_chk $* ; shift ;;
+	-i*)	NSVP_SVPID="-i"`expr "$1" : '-i\(.*\)'` ;;
+
+	-p)	NSVP_IPORT="-p"$2 ; _shift_chk $* ; shift ;;
+	-p*)	NSVP_IPORT="-p"`expr "$1" : '-p\(.*\)'` ;;
+
+	-s)	NSVP_SHELL="-s"$2 ; _shift_chk $* ; shift ;;
+	-s*)	NSVP_SHELL="-s"`expr "$1" : '-s\(.*\)'` ;;
+
+	-t) NSVP_TIMEOUT=$2; _shift_chk $* ; shift ;; 
+	-t*)	NSVPTIMEOUT=`expr "$1" : '-t\(.*\)'` ;;
+
+	-w)	NSVP_WSIZE=$2 ; _shift_chk $* ; shift ;;
+	-w*)	NSVP_WSIZE=`expr "$1" : '-w\(.*\)'` ;;
+
+	-x)	NSVP_APDAPTAB=$2 ; _shift_chk $* ; shift ;;
+	-x*)	NSVP_APDAPTAB=`expr "$1" : '-x\(.*\)'` ;;
+
+	-1)	NSVPSTDOUT=$2 ; _shift_chk $* ; shift ;;
+	-1*)	NSVPSTDOUT=`expr "$1" : '-1\(.*\)'` ;;
+
+	start)	NSVPOPTION="start";;
+	stop)	NSVPOPTION="stop";;
+	status) NSVPOPTION="status";;
+
+	*)	_usage_error $1
+		;;
+	esac
+	shift
+done
+WSSIZE=$NSVP_WSIZE	# from environment variable, default, or -w option.
+export WSSIZE
+case $NSVPOPTION in
+'start')
+	if [ ! -x $NSVPDAEMON -o ! -x $NSVP_CNSVP ]
+	then
+		NOTSTARTED="$NSVPDAEMON or $NSVP_CNSVP not executable\
+			    or missing\n\
+			    NSVP daemon could not be started"
+		echo $NOTSTARTED >>$NSVPSTDOUT
+		exit 2
+	fi
+
+	NSVPD="$NSVPDAEMON	\
+		$NSVP_EQUIV	\
+		-c$NSVP_CNSVP	\
+		$NSVP_HOSTS	\
+		$NSVP_AHOST	\
+		$NSVP_SHELL	\
+		$NSVP_SVPID	\
+		-t$NSVP_TIMEOUT\
+		$NSVP_IPORT"
+	echo $NSVPD -x$NSVP_APDAPTAB >>$NSVPSTDOUT
+	$NSVPD -x"$NSVP_APDAPTAB" >>$NSVPSTDOUT 2>&1 &
+	;;
+'stop')
+
+	$SAXDIR/bin/svpmaint -kill
+	echo "Sax NSVP daemon terminated" >>$NSVPSTDOUT
+	;;
+'status')
+	$SAXDIR/bin/svpdump -proc | grep "NSVP is" >>$NSVPSTDOUT
+	;;
+*)
+	_usage_error $*
+	;;
+esac

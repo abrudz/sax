@@ -1,0 +1,20 @@
+# tm228apl.ini - Copyright (c) 1992, I.P. Sharp Associates
+#
+# @(#)tm228apl.init	1.1.1.1 92/07/06
+#
+# Initialization File for SAX System for:
+#   TM228APL/TM229APL (aka TM3000; Motorola VT220 compatible)
+#   assumes APL font downloaded
+#
+# WARNING: terminal must be initialized as a tm228apl/tm229apl
+#	with the IPSA supplied tm228apl/tm229apl terminfo definitions.
+#
+# Function               Keystroke
+# ========               =========
+#  overstrike            ctrl-P
+-o^P
+#  APL escape            ctrl-A
+-Z^A	
+# choose special output translate table 
+#
+-O$SAXDIR/lib/term/tm220tab

@@ -1,0 +1,77 @@
+#	FSMON menu specs - Copyright (c) 2000, Soliton Associates Ltd.
+
+# topmost level
+FS MONITOR=Start IOS;Stop  IOS;State Info;File  Info;Utilities;Statistics;Configuration;Performance Control;Background Jobs;
+#
+Start IOS=StartIos;
+Stop  IOS=StopIos;
+#Suspend IOS=SuspendIos;
+#Resume  IOS=ResumeIos;
+#State Info=File Table;File Table Index;Tie Table;Tie Table Index;Hold Table;Hold Table Index;Client Table;Client Table Index;
+State Info=File Table;Tie Table;Hold Table;Client Table;
+File  Info=Header;Freelist Profile;
+Utilities=Cfcheck;Sift;Tiers;Holders;
+#Statistics=Detail Stats;Summary;
+Statistics=Summary;
+
+########################
+Configuration=Current Settings;IOS Status;IOS Replacement;
+Performance Control=Horsepower;File Used/Eof Ratio;Compactable Bucket Size;Compaction Throttling;Background Job Quota;Server Timeout;Client Timeout;
+Background Jobs=View Jobs;Kill Jobs;
+# Inspect State Info
+########################
+File Table=DumpFTable;
+File Table Index=DumpFTableIndex;
+Tie Table=DumpTTable;
+Tie Table Index=DumpTTableIndex;
+Hold Table=DumpHTable;
+Hold Table Index=DumpHTableIndex;
+Client Table=DumpCTable;
+Client Table Index=DumpCTableIndex;
+
+########################
+# Utilities
+########################
+Cfcheck=Cfcheck;
+Sift=Sift;
+Tiers=Tiers;
+Holders=Holders;
+
+########################
+# Performance Control
+########################
+Horsepower=Horsepower;
+File Used/Eof Ratio=UsedEofRatio;
+Compactable Bucket Size=BucketSize;
+Background Job Quota=JobQuota;
+Server Timeout=ServerTimeout;
+Client Timeout=ClientTimeout;
+Compaction Throttling=View  Value;Shift Gear;
+View  Value=ViewCTCValue;
+Shift Gear=ShiftCTCGear;
+
+########################
+# Statistics
+########################
+Detail Stats=Statistics;
+Summary=Summary;
+
+########################
+# Configuration
+########################
+Current Settings=CurrentCfg;
+IOS Status=SvrStatus;
+IOS Replacement=SvrReplacement;
+
+########################
+# Background Jobs
+########################
+View Jobs=CheckJobs;
+Kill Jobs=KillJob;
+
+########################
+# File Info
+########################
+Header=DumpFileHdr;
+Freelist Profile=ProfileFlist;
+

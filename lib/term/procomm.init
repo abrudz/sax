@@ -1,0 +1,29 @@
+# procomm.ini - Copyright (c) 1992, I.P. Sharp Associates
+#
+# @(#)procomm.init	1.1.1.1 92/07/06
+#
+# Initialization file for SHARP APL/UX for PROCOMM+ emulating
+#   DEC VT100 and other terminals or emulators with ANSI Standard keyboard
+#   that are capable of displaying APL as 8-bit output (e.g. with a defined
+#   font and a local translate table, as PROCOMM+ can).
+#
+# Initialization of terminal:
+#
+# ANSI mode:                           \033<
+# Reset cursor key application mode:   \033[?1l
+# PFkey native programs:               \033[2u
+-a\033<\033[?1l\033[2u
+#
+#Disable exit output sequence (defaults to ctl-O otherwise):
+-A
+#
+# Function               Keystroke
+# ========               ========
+#  overstrike            ctrl-P
+-o^P
+#  APL escape            ctrl-A
+-Z^A
+#
+# choose output translate table for 8-bit output
+#
+-O$SAXDIR/lib/term/rawotab

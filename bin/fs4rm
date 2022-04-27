@@ -1,0 +1,100 @@
+#!/bin/sh
+# fs4rm - Copyright (c) 2001,  Soliton Associates Limited
+# This script should be used to release all FS4 resources:
+# IPCS, named pipes and the shared memory config file
+# only when FSMON fails to stop FS4
+
+SAXDIR=${SAXDIR:-/usr/sax/rel}
+
+SYSI=${SYSI:-`$SAXDIR/bin/sys -i`}
+
+case $# in 
+	1) fs4user=$1 ;;
+	*) fs4user=fs4admin ;;
+esac
+
+rmmsq()
+{
+	if [ $SYSI = Linux2 ]
+	then 
+		MSQ=msg
+	else
+		MSQ=-q
+	fi
+	ipcs -q | grep $fs4user | while read line
+	do
+		msqid=`echo $line | awk '{print $2}'`
+		ipcrm $MSQ $msqid
+	done
+}
+
+rmshm()
+{
+	if [ $SYSI = Linux2 ]
+	then 
+		SHM=shm
+	else
+		SHM=-m
+	fi
+	ipcs -m | grep $fs4user | while read line
+	do
+		shmid=`echo $line | awk '{print $2}'`
+		ipcrm $SHM $shmid
+	done
+	# if POSIX shared memory is used
+	if [ $SYSI = Linux2 ] 
+	then
+		if [ -f /dev/shm/0x64 ]
+		then
+	    	rm -f /dev/shm/0x64
+		fi
+	elif [ $SYSI = SYSSPARC ] # could be on different locations
+	then
+		if [ -f /tmp/.SHMD0x64 ] ; then
+			rm -f /tmp/.SHMD0x64 
+		elif [ -f /tmp/.SHMD/0x64 ] ; then
+			rm -f /tmp/.SHMD/0x64
+		fi
+	fi
+}
+
+rmsem()
+{
+	if [ $SYSI = Linux2 ]
+	then 
+		SEM=sem
+	else
+		SEM=-s
+	fi
+	ipcs -s | grep $fs4user | while read line
+	do
+		semid=`echo $line | awk '{print $2}'`
+		ipcrm $SEM $semid
+	done
+}
+
+rmpipe()
+{
+	rm -f /var/tmp/.fh_*
+}
+
+echo Removing FS4 message queues ...
+rmmsq
+echo done
+
+echo Removing FS4 shared memory ...
+rmshm
+echo done
+
+echo Removing FS4 semaphores ...
+rmsem
+echo done
+
+echo Removing FS4 named pipes ...
+rmpipe
+echo done
+
+echo Removing FS4 shared memory cfg file ...
+rm -f /var/tmp/.fs4shm
+echo done
+

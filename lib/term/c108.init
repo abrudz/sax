@@ -1,0 +1,45 @@
+# c108.ini - Copyright (c) 1992, I.P. Sharp Associates
+#
+# @(#)c108.init	1.1.1.1 92/07/06
+#
+# Initialization File for SAX for:
+#   Human Design Systems Concept 108
+#
+#  Program Function Keys used:
+#								(len,k,t,msg)
+#  Key Label	Function		Transmitted sequence	HDS Program 
+#   insrt	 insert mode toggle	 ^T           		^[4!0"^T
+#   del char     delete character        ^D			^[4!1"^D
+#   line ins     insert blank line       TAB I			^[4"2"^Ii
+#   line del     delete line		 TAB DD			^[4#""^Idd
+#   clear eol    clear to line end       ^E			^[4!3"^E
+#   send	 RETURN			 ^M			^[4!4"^M
+#   F1		 APL Prefix		 ^A			^[4!5"^A
+#   F2		 O-U-T			 ^Z			^[4!6"^Z
+#   F3		 Refresh Screen 	 ^F			^[4!7"^F
+#   F4		 Break line		 TAB .			^[4"8"^I.
+#   F5		 Glue line		 TAB ,			^[4"9"^I,
+#   F6 	 	 Put Line below cursor 	 TAB p			^[4":"^Ip
+#   F7		 Put Line above cursor	 TAB P			^[4";"^IP
+#   F8		 Yank Line into buffer   TAB [[			^[4#<"^I[[
+#   F9		 String search		 TAB /			^[4"="^I/
+#   F10		 Overstriking BS	 ^A^H			^[4">"^A^H
+#   F11		 Overstriking BS	 ^A^H			^[4"?"^A^H
+#   
+#   F14		 Editor completion	 TAB z RETURN		^[4#B"^Iz^M
+#   F13		 Forward to APL session  TAB s RETURN		^[4#A"^Is^M
+#   F12		 APL Prefix		 ^A			^[4!@"^A
+#
+#
+-a^N\033U\033X^[4!0"^T^[4!1"^D^[4"2"^Ii^[4#""^Idd^[4!3"^E^[4!4"^M^[4!5"^A^[4!6"^Z^[4!7"^F^[4"8"^I.^[4"9"^I,^[4":"^Ip^[4";"^IP^[4#<"^I[[^[4"="^I/^[4">"^A^H^[4"?"^A^H^[4#B"^Iz^M^[4#A"^Is^M^[4!@"^A
+#
+-A^O
+#
+# CURSOR KEYPAD enabled:
+#
+# Function               Keystroke
+# ========               =========
+#
+# choose output translate table for typewriter paired apl/ascii terminal
+#
+-O$SAXDIR/lib/term/aplotab

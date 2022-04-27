@@ -1,0 +1,126 @@
+#!/bin/sh
+# sax_run - Copyright (c) 2000, Soliton Associates Limited
+# Run SAX
+
+  
+# We must use /usr/5bin/stty if at all possible as /usr/bin/stty has
+# a 'Operation not supported on socket' problem
+
+if [ -x /usr/5bin/stty ]
+then
+  STTY=/usr/5bin/stty
+else
+  STTY=stty
+fi
+export STTY
+# preserve terminal settings
+if [ $TERM != xterm -a $TERM != sun-cmd ]
+then
+  STTYG=`$STTY -g`
+fi
+# prevent BREAK from affecting shell script
+trap "" 2 3
+
+# Directory where this stuff is installed
+SAXDIR=${SAXDIR:-/usr/sax/rel}
+# Directory for user-configurable files
+SAXCNF=${SAXCNF:-/usr/sax/local}
+if [ ! -d $SAXCNF ]
+then
+  SAXCNF=$SAXDIR
+fi
+
+# Update PATH so things like "sortio" will be found
+PATH=$SAXDIR/bin:$PATH
+export SAXDIR SAXCNF PATH
+
+
+# Defaults
+SAXRC=${SAXRC:-$HOME/.saxrc}			# user specific profile
+WSSIZE=${WSSIZE:-500000}			# workspace size
+EDITSIZE=${EDITSIZE:-65536}			# editor storage size
+APLPATH=${APLPATH:-$SAXDIR/bin/apl}		# interpreter file
+INIT=${INIT:-$SAXDIR/lib/term/$TERM.init}	# $TERM is set at sign on
+
+if [ -f $SAXCNF/etc/atermcap ]		# try site-local version first....
+then
+  TERMCAP=$SAXCNF/etc/atermcap
+else
+  TERMCAP=$SAXDIR/etc/atermcap	# else use the SAX distributed version
+fi
+
+# TFLG=t: tty-mode APD; w: windows mode APD
+TFLG=t
+# window APD only used for apl-8
+if [ `basename $APLPATH` = "apl-8" ]
+then TFLG=w
+fi
+
+SYS=`$SAXDIR/bin/sys`	# system type for this script.
+export SAXDIR SYS
+
+SAXAPD=${SAXAPD:-$SAXDIR/bin/apd}
+if [ $TFLG = t ]
+then
+  SAXAPTAB=${SAXAPTAB:-$SAXDIR/etc/apd_t.tab}
+  SAXAPDSM=${SAXAPDSM:-"-SM"}
+  if [ -d $SAXCNF/lib/terminfo ] # try site-local version first....
+  then
+    TERMINFO=${TERMINFO:-$SAXCNF/lib/terminfo}
+  else	# else use the SAX distributed version
+    TERMINFO=${TERMINFO:-$SAXDIR/lib/terminfo} 
+  fi
+else
+  SAXAPTAB=${SAXAPTAB:-$SAXDIR/etc/apd.tab}
+  SAXAPDSM=${SAXAPDSM:-"-d0"}
+fi
+
+# Examine user's "profile"
+if [ -f $SAXRC ]
+then
+  . $SAXRC
+fi
+
+if [ -f $INIT ]
+then
+  INIT=-N$INIT
+else
+  INIT=""
+fi
+
+MALLOCTYPE=${MALLOCTYPE:-3.1} ; export MALLOCTYPE # help avoid aix 3.2 cc bugs.
+
+export TERMINFO TERMCAP APLPATH WSSIZE EDITSIZE SAXAPD SAXAPTAB SAXAPDSM
+
+if [ $TERM = sun-cmd -o ! -z "$DISPLAY" ]
+then
+  if [ `basename $APLPATH` = "apl" ]
+  then
+    $STTY raw -echo isig
+  fi
+fi
+
+# xterm under OpenLook defaults to istrip (which disables 8 bit input)
+# so we must turn istrip off
+if [ $TERM = xterm -a `basename $APLPATH` = "apl-8" ]
+then
+  $STTY -istrip
+fi
+
+# Run APL
+$APLPATH -G -S10 -L1$SAXDIR/lib/wss -L6$SAXDIR/lib/wss6 -L8$SAXDIR/lib/wss8 -L32$SAXDIR/lib/wss32 $INIT $WSSIZE -M$EDITSIZE $APLPARMS "$@"
+
+# An honest attempt to restore terminal settings to sanity
+if [ $TERM != xterm -a $TERM != sun-cmd ]
+then
+  $STTY $STTYG
+fi
+
+# if we loaded apl-8 keyboard under sunview, now is the time to undo it.
+if [ ! -z "$WINDOW_PARENT" -a `basename $APLPATH` = "apl-8" ]
+then
+  if [ $SYS = SYSSPARC -o $SYS = SYSS386I ]
+  then
+    loadkeys
+  fi
+fi

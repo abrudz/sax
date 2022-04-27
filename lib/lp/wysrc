@@ -1,0 +1,30 @@
+#
+# Default wys parameters.
+#
+BGflag=1	# -b
+Copy=1		# -c
+Charff=@	# -C
+# Prt=		# -d (machine dependent, filled within wys, but may be changed)
+Font=/APLitalic	# -f
+Filecov=0	# -F
+Headflag=7	# -h
+Head=""		# -H 
+Jobcov=0	# -j
+Landscape=0	# -l
+Lines=99999	# -L
+Message=0       # -m
+Newpage=0	# -n
+Name=""		# -N
+Outfile=""	# -o
+Points=10	# -p
+Pagenr=1	# -P
+Req=/dev/null	# -r
+Remove=0	# -R
+STSCflag=0	# -s
+Startpg=1	# -S
+Tabs=8		# -t
+Verbose=0	# -v
+Wrap=0		# -w
+Wrapl=0		# -W
+Wrapc=\\	# -x
+Wrapi=6		# -y

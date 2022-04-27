@@ -1,0 +1,17 @@
+# xterm.ini - Copyright (c) 1992, I.P. Sharp Associates
+#
+# @(#)xterm.init	1.1.1.2 93/02/01
+#
+# Initialization file for SAX for
+# xterm windows
+#
+# Initialization of terminal:
+#
+# reset cursor key application mode
+# -a\033[?1l
+# APL escape - originally to F1 ( -Z\033[11~ ), now to Ctrl-A:
+-Z^A
+# APL overstrike -originally to F2 ( -o\033[12~ ), now to Ctrl-P:
+-o^P
+# output table
+-O$SAXDIR/lib/term/Xotab

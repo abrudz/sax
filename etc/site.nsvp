@@ -1,0 +1,12 @@
+#------	Site specifiable NSVP configuration parameters.
+
+#	@(#)site.nsvp	1.1	94/06/14
+
+#	Refer to the SAX administrators manual or $SAXDIR/etc/nsvp.script for
+#	valid options. Place options you wish to specify within the quotation
+#	marks in the following assignment statement.
+#
+#	Example: SITE_NSVP="-d 255 -w 1500000"
+
+
+SITE_NSVP=" "

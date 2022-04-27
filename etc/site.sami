@@ -1,0 +1,12 @@
+#------	Site specifiable SAMI configuration parameters.
+
+#	@(#)site.sami	1.1	94/06/14
+
+#	Refer to the SAMI administrators manual or $SAXDIR/etc/sami.script for
+#	valid options. Place options you wish to specify within the quotation
+#	marks in the following assignment statement.
+#
+#	Example: SITE_SAMI="-s 50 -u 10"
+
+
+SITE_SAMI=" "

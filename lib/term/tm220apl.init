@@ -1,0 +1,22 @@
+# tm220apl.ini - Copyright (c) 1992, I.P. Sharp Associates
+#
+# @(#)tm220apl.init	1.1.1.1 92/07/06
+#
+# Initialization File for SAX System for:
+#   TM220APL
+#   assumes APL font downloaded
+#
+# Function               Keystroke
+# ========               =========
+#  overstrike            shift of '<X' (DEL) key
+-o^P
+#  APL escape            "DO" key (top row)
+-Z^A
+# choose special output translate table 
+#
+-O$SAXDIR/lib/term/tm220tab
+
+
+
+
+

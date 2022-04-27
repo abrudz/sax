@@ -1,0 +1,98 @@
+#!/bin/sh
+# btask.scheduler - Copyright (c) 1996, Soliton Associates Limited
+#
+#
+# syntax: btask.scheduler start [-a btaskpath ] [ -r ] [ -W serverws ]
+#
+#	  btask.scheduler stop [ -g seconds ] [ -k ]
+#
+#
+#
+#
+#  flags:
+#   starting flags:
+#	-a	Alternate path to directory containing btask files.	
+#
+#	-r	Do not restart tasks active at time of last normal or abnormal
+#		termination of the btask scheduler ( unimplemented )
+#	-W 	Path or library style server workspace 
+#	 	
+#   stopping flags:
+#	-g	Grace period ( time in seconds ) before shutdown.
+#	-k	Bounce active batch tasks.
+#
+
+SAXDIR=${SAXDIR:-/usr/sax/rel}	; export SAXDIR
+HOME=${HOME:-/}			; export HOME
+APLPATH=$SAXDIR/bin/apl-8	; export APLPATH
+SAXAPTAB=$SAXDIR/etc/apd_nsvp.tab ; export SAXAPTAB
+SYS=`$SAXDIR/bin/sys`		; export SYS
+
+#  defaults:
+
+BT_PATH="$SAXDIR/lib/btask"	# -a
+BT_RESTART="restart"		# -r
+BT_WSID="314159 bserver"	# -W
+BT_GRACE="0"			# -g
+BT_KILL=""			# -k
+BT_OPTION=""
+
+_usage_error()
+{
+echo $@
+echo "usage: "
+echo " btask.scheduler start [ -a btaskpath ] [ -W serverws ] [ -r ]"
+echo " btask.scheduler stop  [ -a btaskpath ] [ -W serverws ] [ -g seconds ]"
+exit 1
+}
+
+_shift_chk()
+{
+	if [ ! $# -gt 1 ] ; then _usage_error $* ; fi
+}
+
+while [ $# != 0 ]
+do
+	case $1 in
+
+	-a)	BT_PATH=$2 ; _shift_chk $* ; shift ;;
+	-a*)	BT_PATH=`expr "$1" : '-a\(.*\)'` ;;
+	
+	-r)	BT_RESTART="norestart" ;;
+
+#	-u)	BT_UID=$2 ; _shift_chk $* ; shift ;;
+#	-u*)	BT_UID=`expr "$1" : '-u\(.*\)'` ;;
+
+	-W)	BT_WSID=$2 ; _shift_chk $* ; shift ;;
+	-W*)	BT_WSID=`expr "$1" : '-W\(.*\)'` ;;
+
+	-g)	BT_GRACE=$2 ; _shift_chk $* ; shift ;;
+	-g*)	BT_GRACE=`expr "$1" : '-g\(.*\)'` ;;
+
+	-k)	BT_KILL=",hard" ;;
+
+	start)	BT_OPTION="start" ;;
+	stop)	BT_OPTION="stop" ;;
+
+	*)	_usage_error $1
+		;;
+	esac
+	shift
+done
+
+case $BT_OPTION in
+'start')
+	echo "starting B-task scheduler"
+	$SAXDIR/bin/detach $SAXDIR/bin/detachsax -L314159$BT_PATH \
+		-W"$BT_WSID" -s$BT_RESTART
+	;;
+
+'stop')
+	echo "stopping B-task scheduler"
+	$SAXDIR/bin/detach $SAXDIR/bin/detachsax -L314159$BT_PATH \
+		-W"$BT_WSID" -sdown$BT_KILL$BT_GRACE
+	;;
+*)
+	_usage_error $*
+	;;
+esac

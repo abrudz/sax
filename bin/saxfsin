@@ -1,0 +1,43 @@
+#!/bin/sh
+# saxfsin - Copyright (c) 1993, Soliton Associates
+#
+
+#!/bin/sh
+# Stripped down version of "sax", specialized for xfer of APL files.
+# Uses argument 1 as name of the input transfer file, - will read stdin.
+# Uses argument 2 as name of APL file.
+# 
+# NOTE: \314 = APL [], \373 = <-, \310 = 'delta', \374 = 'delta underbar'.
+#       in order to make this file readable and changeable with vi, we used
+#       the following convertions, # = APL [], < = <-.
+#       + and = are the unix replacements for 'delta' and 'delta underbar'.	
+
+SAXDIR=${SAXDIR:-/usr/sax/rel}
+WSSIZE=${WSSIZE:-1500000}
+APLPATH=${APLPATH:-$SAXDIR/bin/apl-8}
+SAXBANNER=/dev/null
+SAXAPD=${SAXAPD:-$SAXDIR/bin/apd}
+SAXAPTAB=${SAXAPTAB:-$SAXDIR/etc/apd.tab}
+SAXAPDSM=${SAXAPDSM:-"-d0"}
+export SAXDIR WSSIZE APLPATH SAXBANNER SAXAPD SAXAPTAB SAXAPDSM
+
+fsiIN=$1
+
+fsiOUT=$2##
+fsiOUT=`echo $fsiOUT | sed -e 's/\.f##//' -e 's/\.[is]f##//' -e 's/##//'`
+fsiOUT=`echo $fsiOUT | tr "+=" "\310\374" `
+
+TMP=./SAXFSIN$$
+rm -f $TMP
+
+echo "#trap <'a c'" | tr "#<" "\314\373" >$TMP
+echo "'$fsiOUT' #stie 1" | tr "#<" "\314\373" >>$TMP
+echo "'$fsiOUT' #erase 1" | tr "#<" "\314\373" >>$TMP
+echo "#trap <''" | tr "#<" "\314\373" >>$TMP
+echo "'$fsiOUT' #create 1" | tr "#<" "\314\373" >>$TMP
+
+cat $TMP $fsiIN | `dirname $APLPATH`/apl-8 -B -J0 $WSSIZE $APLPARMS
+
+rm -f $TMP
+
+exit 0			# to keep makefiles happy

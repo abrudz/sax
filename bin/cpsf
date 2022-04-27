@@ -1,0 +1,106 @@
+#!/bin/sh
+#
+# cpsf  A utility to copy SHARP APL files
+USAGE="usage: cpsf [-v {1|2|3}] [-p passno0] source0 ... [-p passnoN] sourceN [-v {1|2|3}] sink"
+# 
+#
+#	-v n :  Start APL with -Yusefilelocks=n
+#
+#	.sf* extensions are ignored.
+#
+#
+SRCV=1    	# default source file version
+SNKV=3    	# default sink file version
+MULTI=0		# flag: more that 1 source file
+HAVEFILES=0	# flag: in options parse we've seen a file name
+NXTPASS=""	# passno for next file
+
+_usage () 
+{
+echo $USAGE
+exit 1
+}
+
+# Scan arguments
+while [ $# != 0 ]
+do
+	case $1 in
+	-v)	if [ $# = 1 ]
+		then 
+		  _usage
+		else
+		  if [ $HAVEFILES = 0 ]
+		  then
+		    case $2 in 
+		    1|2|3)	SRCV=$2;;
+		    *)    	_usage;;
+		    esac
+		  else
+		    case $2 in 
+		    1|2|3)	SNKV=$2;;
+		    *)		_usage;;
+		    esac
+		  fi
+		fi;shift;shift;;
+	-p)	if [ $# = 1 ]
+		then
+		  _usage
+		else
+		  NXTPASS=$2
+		fi;shift;shift;;
+	*)	HAVEFILES=1
+		THISPASS="$NXTPASS#"
+		NXTPASS=""
+		if [ $# = 1 ] 
+		then
+		  DIR=`dirname $1`
+		  if [ "$DIR" = "." ]
+		  then 
+			SINK="./$1"
+		  else
+		  	SINK=$1
+		  fi
+		else
+		  if [ ! "" = "$SOURCE" ]
+		  then
+			MULTI=1
+		  fi
+		  DIR=`dirname $1`
+		  if [ "$DIR" = "." ]
+		  then 
+			SOURCE="$SOURCE $THISPASS./$1"
+		  else
+		  	SOURCE="$SOURCE $THISPASS$1"
+		  fi
+		fi; shift;; 
+	esac
+done
+
+if [ "" = "$SOURCE" ] 
+then
+  	_usage
+fi
+
+# Figure out what sink is.
+if [ -d $SINK ] 
+then
+	# Okay, a dir
+	SNKT=d
+else
+        SNKT=f
+	if [ $MULTI = 1 ]
+	then
+		_usage
+	fi
+	SINK="#"$SINK
+fi
+
+CMD="master:$SOURCE:$SINK:$SNKV:$SNKT"
+
+STARTAPS=no
+SAXDIR=${SAXDIR:-/usr/sax/rel}
+APLPATH=$SAXDIR/bin/apl-8
+export STARTAPS SAXDIR APLPATH
+CONVWS=$SAXDIR/lib/wss/fsconv
+$APLPATH -J0 -B -W$CONVWS -Yusefilelocks=$SRCV -s"$CMD"
+exit 0

@@ -1,0 +1,24 @@
+# sun-cmd.ini - Copyright (c) 1992, I.P. Sharp Associates
+#
+# @(#)sun-cmd.init	1.1.1.2 93/02/01
+#
+# Initialization file for SAX for SunView emulating
+#   DEC VT100 and other terminals or emulators with ANSI Standard keyboard
+#   that are capable of displaying APL as 8-bit output. The sunotab table
+#   assumes one of the supplied Vfonts is being used 
+#
+# Initialization of terminal:
+#
+#Disable exit output sequence (defaults to ctl-O otherwise):
+-A
+#
+# Function               Keystroke
+# ========               =========
+#  overstrike            
+-o^P
+#  APL escape            (Alternate key)
+-Z^A
+#
+# choose output translate table for 8-bit output to sax* Vfont
+#
+#-O$SAXDIR/lib/term/sunotab

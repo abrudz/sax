@@ -1,0 +1,63 @@
+#!/bin/sh
+# rc_local.sax for ipcs svp - Copyright (c) 1999, Soliton Associates Limited
+#
+# @(#)$Header: /usr/cvsroot/sax/src/svp/rc_local.sax,v 1.4 2004/07/23 20:15:20 dragan Exp $
+
+# syntax: rc_local.sax	[ start | stop ]
+#
+# Start or stop the sax enviroment with ipcs svp
+#
+# This script must be run by root.
+#
+# For start processing the svp is configured with site specified configuration
+# parameters and and the nsvp daemon is started. For stop processing the nsvp
+# daemon is stopped and the svp is shut down.
+#
+# This script should normally be invoked by the system init daemon during
+# run_level three initialization (ie: rc3 processing which will supply the
+# required start argument). The recommended procedure for implementing this
+# is to issue the following commands from the root userid:
+#
+#	SAXDIR=/usr/sax/rel
+#	ln -s $SAXDIR/etc/conf/rc_local.sax /etc/rc3.d/S99sax
+
+set -e  # stop on the first error
+
+#------	Validate start/stop (default is start).
+
+sos1=${1:-start}
+STARTNSVP=${STARTNSVP:-no}   # if to start NSVP as well
+
+case	$sos1 in
+	start|stop)	;;
+	*)		echo "Usage: $0 [ start | stop ]"
+			exit 1
+			;;
+esac
+
+#------	Sax base directory (default is for customer convenience).
+
+SAXDIR=${SAXDIR:-/usr/sax/rel} ; export SAXDIR
+
+
+#------	Site specified SVP and NSVP configuration parameters.
+
+. $SAXDIR/etc/site.svp		# SITE_SVP
+if [ $STARTNSVP = "yes" ] 
+then
+	. $SAXDIR/etc/site.nsvp		# SITE_NSVP
+fi
+
+ulimit -H -d unlimited
+
+#------	Start/stop the SVP and NSVP.
+
+if	[ $sos1 = "start" ]
+then
+	$SAXDIR/bin/svpmaint -init $SITE_SVP
+	if [ $STARTNSVP = "yes" ] ; then
+		$SAXDIR/etc/nsvp.script start $SITE_NSVP
+	fi
+else
+	$SAXDIR/etc/conf/svp.stop
+fi

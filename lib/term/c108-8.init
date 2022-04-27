@@ -1,0 +1,22 @@
+# c108-8.ini - Copyright (c) 1992, I.P. Sharp Associates
+#
+# @(#)c108-8.init	1.1.1.1 92/07/06
+#
+-a^N\033U\033X^[4"%%#^Aa^[4"&#^Ab^[4"'#^Ac^[4"(#^Ad^[4")#^Ae^[4"*#^Af^[4"+#^Ag^[4",#^Ah^[4"-#^Ai^[4".#^Aj^[4"/#^Ak^[4"C#^Al^[4"D#^Am^[4"E#^An^[4"G#^Ao^[4"I#^Ap^[4"K#^Aq^[4"M#^Ar^[4"O#^As^[4"Q#^At^[4" #^A'^[4"!#^A`^[4""#^Au^[4"##^Av^[4"$#^A^[4"7#^A\\^[4"8#^A/^[4"9#^A=^[4":#^Aw^[4";#^Ax^[4"<#^Ay^[4"=#^Az^[4">#^A0^[4"?#^A1^[4"@#^A2^[4"A#^A3^[4"B#^A4^[4"F#^A5^[4"H#^A6^[4"J#^A7^[4"L#^A8^[4"N#^A9^[4"P#^A-^[4"0#^A,^[4"1#^A.^[4"2#^A;^[4"3#^A[^[4"4#^A]
+# Initialization File for SAX for:
+#   Human Design Systems Concept 108
+#
+# Programmer mode:         ^[U
+# CURSOR KEYPAD enabled:   ^[X
+#
+#  Program Function Keys used:
+#								(len,k,t,msg)
+#  Key Label	Function		Transmitted sequence	HDS Program 
+#
+-A^O
+#
+# Function               Keystoke
+# ========               ========
+# choose output translate table for typewriter paired apl/ascii terminal
+#
+-O$SAXDIR/lib/term/aplotab

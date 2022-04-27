@@ -1,0 +1,103 @@
+# arg1=job/file flag # arg2=begin/end flag
+if [ -x /usr/5bin/echo  ]
+then 
+	Echo=/usr/5bin/echo
+else
+	Echo=echo
+fi
+export Echo
+
+Date=`date`
+
+if test "$1" = 0
+   then	if test "$2" = 0
+	   then	Where="BEGIN OF JOB"
+	   else	Where="END OF JOB"
+	fi
+   else	if test "$2" = 0
+	   then	Where="BEGIN OF FILE "$i
+	   else	Where="END OF FILE "$i
+	fi
+fi
+
+if test "$Trayflag" = 1
+   then $Echo "statusdict begin 0 setpapertray end" >> $Tmp
+fi
+
+Sep=$Tmp's'
+
+$Echo "********************************************************************************" >>$Sep
+$Echo "\n"$Where" \n\n"$Date"\n" >>$Sep
+$Echo "********************************************************************************" >>$Sep
+$Echo "\nCurrent option settings:" >>$Sep
+$Echo "\t-b "$BGflag >>$Sep
+$Echo "\t-c "$Copy >>$Sep
+$Echo "\t-C "$Charff >>$Sep
+$Echo "\t-d "$Prt >>$Sep
+$Echo "\t-f "$Font >>$Sep
+$Echo "\t-F "$Filecov >>$Sep
+$Echo "\t-h "$Headflag >>$Sep
+$Echo "\t-H "$Head >>$Sep
+$Echo "\t-j "$Jobcov >>$Sep
+$Echo "\t-l "$Landscape >>$Sep
+$Echo "\t-L "$Lines >>$Sep
+$Echo "\t-m "$Message >>$Sep
+$Echo "\t-n "$Newpage >>$Sep
+$Echo "\t-N "$Name >>$Sep
+$Echo "\t-o "$Outfile >>$Sep
+$Echo "\t-p "$Points >>$Sep
+$Echo "\t-P "$Pagenr >>$Sep
+$Echo "\t-r "$Req >>$Sep
+$Echo "\t-R "$Remove >>$Sep
+$Echo "\t-s "$STSCflag >>$Sep
+$Echo "\t-S "$Startpg >>$Sep
+$Echo "\t-t "$Tabs >>$Sep
+$Echo "\t-v "$Verbose >>$Sep
+$Echo "\t-w "$Wrap >>$Sep
+$Echo "\t-W "$Wrapl >>$Sep
+$Echo "\t-x "$Wrapc >>$Sep
+$Echo "\t-y "$Wrapi" \n" >>$Sep
+$Echo "********************************************************************************" >>$Sep
+$Echo "\n"$Where" \n\n"$Date"\n" >>$Sep
+$Echo "********************************************************************************" >>$Sep
+ 
+	x=$Dir'/'$Stem'wyg'
+	x="$x -c1 -p $Points -h0 -t $Tabs -s $STSCflag -w $Wrap"
+	x="$x -y $Wrapi -W $Wrapl -n $Newpage -L $Lines -C $Charff"
+	x="$x -S $Startpg -l $Landscape -P0"
+
+        if test "$Font" != ""
+           then x="$x -f $Font"
+        fi
+
+        if test "$Charff" != "\\"
+           then x="$x -C $Charff"
+           else x="$x -C \\\\"
+        fi
+
+        if test "$Wrapc" != ""
+           then if test "$Wrapc" != "\\"
+                   then x="$x -x $Wrapc"
+                   else x="$x -x \\\\"
+                fi
+        fi
+
+        if test "$Head" != ""
+           then x=$x" -H "'"'$Head'"'
+        fi
+
+        if test "$Name" != ""
+           then x=$x" -N "'"'$Name'"'
+        fi
+#
+# Add the option termination ("--") after the LAST parameter !!!!!!!
+#
+# Create the printfile
+#
+ 	eval $x " -- " $Sep >> $Tmp
+
+/bin/rm -f $Sep
+
+if test "$Trayflag" = 1
+   then	$Echo "statusdict begin 1 setpapertray end" >> $Tmp
+fi

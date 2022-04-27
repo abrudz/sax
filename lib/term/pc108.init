@@ -1,0 +1,25 @@
+# pc108.ini - Copyright (c) 1992, I.P. Sharp Associates
+#
+# @(#)pc108.init	1.1.1.1 92/07/06
+#
+-a^[U^[4"$#^A^H
+# Initialization File for SAX for:
+#   Human Design Systems Concept 108
+#
+# Programmer mode:         ^[U
+# CURSOR KEYPAD enabled:   ^[X
+#
+#  Program Function Keys used:
+#								(len,k,t,msg)
+#  Key Label	Function		Transmitted sequence	HDS Program 
+#
+-A^O
+#
+# Function               Keystroke
+# ========               =========
+# overstriking escape
+-o^P
+#
+# choose output translate table for typewriter paired apl/ascii terminal
+#
+-O$SAXDIR/lib/term/aplotab

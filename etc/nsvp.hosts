@@ -1,0 +1,13 @@
+# nsvp.hs - Copyright (c) 2002, Soliton Inc.
+#
+# @(#)nsvp.hosts	1.1.1.4 94/01/27
+#
+# This file contains a list of NSVP hosts not included in /etc/hosts
+#
+# The format of entries is one of:
+# hostname1	gatewayhost@internetport
+# hostname2	childpath
+#
+# "@" must not be part of "childpath"
+#
+#

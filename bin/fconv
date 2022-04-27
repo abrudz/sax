@@ -1,0 +1,36 @@
+#!/bin/sh
+
+SAXDIR=${SAXDIR:-/usr/sax/rel}	
+export SAXDIR
+
+RECURSIVE="0"		# -r
+Spath=`pwd`
+
+while [ $# -ne 0 ]; do
+    case $1 in
+    -r)     RECURSIVE=1;;
+    -p)     Spath="$2";;
+    -*)     echo "Usage [-r] [-p] pathname"; exit ;;
+     *)     Spath="$1";;
+    esac
+
+    shift
+done
+
+if (  [ -d  $Spath ] && [ $RECURSIVE = 1 ] )
+then 
+	find $Spath -name \*.sf -print | xargs sift
+	exit
+fi
+
+if [  -d  $Spath ]
+then
+	cd $Spath ;
+	find . ! -name . -prune -name \*.sf -print | xargs sift 
+	exit
+else 
+	$SAXDIR/bin/sift $Spath
+	exit
+
+fi
+exit

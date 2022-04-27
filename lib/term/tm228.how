@@ -1,0 +1,6 @@
+/* tm228.how - Copyright (c) 1992, I.P. Sharp Associates */
+
+/* @(#)tm228.how	1.1.1.1 92/07/06 */
+
+APL TM228:	 APL esc:  "DO"			APL o/s: shift <X|
+		scroll   F7/F8			page        F9/F10

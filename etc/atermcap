@@ -1,0 +1,554 @@
+# standard.atc - Copyright (c) 2002, Soliton Inc.
+#
+# @(#)standard.atc	1.1.1.16 94/10/26
+#
+# atermcap:  STSC/IPSA termcap file that is believed to work
+#            correctly for
+#            both the SAX System and other termcap-dependent
+#            UNIX utilities such as vi and more.  See "SAX
+#            Environment" manual for instructions on using this file.
+# Version:  8 Apr 1990
+#
+#	There is a small problem with Sun Microsystems workstations;
+#	Sun3, Sun386i and SPARC have all their commandtool windows
+#	defined as "sun-cmd", but the actual key definitions are
+#	different in each case.  That's why this file must be
+#	accompanied by syssun.atc & al., which will be catenated
+#	to the end of this file during install. /JDV
+#
+# Terminals Supported    TERM names    [Status]
+# -------------------    ----------    --------
+#   IBM PC-AT Console
+#     running XENIX	  AT PCAT	tested OK.
+#   APL*PLUS/PC Rel 4.0   pc ibmpc 	tested OK
+#     (Rel 4.0 entry should be used with Release 5.0 and newer)
+#   APL*PLUS/PC Rel 3.0   p3 ibmpc3	[Obsolete; use of Rel 4.0 recommended]
+#   Callan Unistar 200    cvt100	tested OK
+#   HDS Concept 108       c8 c108 	tested OK
+#   IPSA PC108            pc108 pc108-c tested OK
+#   HDS Concept AVT/GVT   c9 avt 	tested OK
+#   Cadmus bitmap         bip		tested OK
+#   HP2641A		  hp            tested OK
+#   Wicat T7000 (MG8000)  t7000		tested OK; attribute support limited
+#   Fortune Systems term  FT		untested
+#   DEC vt100 		  vt100		untested
+#   DEC vt220 		  vt220		tested OK
+#   AT&T Unix PC	  s4 		tested OK
+#   Spintronics hardcopy  sx		tested OK
+#   Anderson/Jacobson 520 aj520
+#   PROCOMM+ terminal emulator (vt100 w 8bit output)
+#   PC-220                pc220		in work - 07/21/88 - jackw
+# 
+#
+#--------------------
+#
+# sun-console: a copy from Sun OS 4.1.1 /etc/termcap on SPARC 1+
+Mu|sun|Sun Microsystems Workstation console:\
+	:am:bs:km:mi:ms:pt:li#34:co#80:cl=^L:cm=\E[%i%d;%dH:\
+	:ce=\E[K:cd=\E[J:\
+	:so=\E[7m:se=\E[m:us=\E[4m:ue=\E[m:rs=\E[s:\
+	:md=\E[1m:mr=\E[7m:me=\E[m:\
+	:al=\E[L:dl=\E[M:im=:ei=:ic=\E[@:dc=\E[P:\
+	:AL=\E[%dL:DL=\E[%dM:IC=\E[%d@:DC=\E[%dP:\
+	:up=\E[A:nd=\E[C:ku=\E[A:kd=\E[B:kr=\E[C:kl=\E[D:\
+	:k1=\E[224z:k2=\E[225z:k3=\E[226z:k4=\E[227z:k5=\E[228z:\
+	:kh=\E[H:\
+	:k6=\E[229z:k7=\E[230z:k8=\E[231z:k9=\E[232z:
+# pc108 support for IPSA's HDS 108 emulator.
+pc108|pc108-c|pc108stif|IPSA's pc108 program:\
+	:am:eo:es:hs:mi:ul:xn:xo:pt:\
+	:co#80:li#24:kn#9:\
+	:ae=^O:as=^N:cd=16*\E^E:ce=16\E^U:\
+	:cl=2*\E?\E^E:\
+	:cm=\Ea%+ %+ :\
+	:dc=16*\E 1:dl=3*\E^B:ds=\E ;^?:ei=\E\200:fs=\Ee\E z :\
+	:i1=\EK\E!\E F:im=\E^P:ip=16*:\
+	:is=\EU\E F\Ef\E7\E5\E8\E z#\EQ \E z#^W\El\ENH\EK\E\200\Eo&\200\Eo\47\E\200\
+\200\200\200\200\200\200\200\200:\
+	:k1=^R5\r:k2=^R6\r:k3=^R7\r:k4=^R8\r:k5=^R9\r:\
+	:k6=^R\072\r:k7=^R;\r:k8=^R<\r:k9=^R=\r:kb=\b:kd=\E<:\
+	:kh=\E?:kl=\E>:kP=\E.:kr=\E=:ks=\EX:ku=\E;:nd=\E=:\
+	:kD=^?:kN=\E-:kF=\E\114:kR=\E[:\
+	:rp=\Er%.%+ $<.2*>:se=\Ed:so=\ED:\
+	:te=\Ev  ^B p\200\200\200\200\200\200\Ep\r\n:\
+	:ti=\EU\E F\E^G!\Ev  8p\200\200\200\200\200\200\200\200\Ep\r:\
+	:ts=\E z"\E?\EE:ue=\Eg:up=\E;:us=\EG:\
+	:vb=20\Ek\EK:ve=\Ew:vs=\EW:
+pc108-m|IPSA's pc108 program, segregated memory (flicker) vn:\
+	:am:eo:es:hs:mi:ul:xn:xo:pt:\
+	:co#80:li#24:kn#6:\
+	:ae=^O:al=3*\E^R:as=^N:cd=16*\E^E:ce=16\E^U:\
+	:cl=2*\E?\E^E:\
+	:cm=\Ea%+ %+ :\
+	:dc=16*\E 1:dl=3*\E^B:ds=\E ;^?:ei=\E\200:fs=\Ee\E z :\
+	:i1=\EK\E!\E F:im=\E^P:ip=16*:\
+	:is=\EU\Ef\E7\E5\E8\El\ENH\E\200\Eo&\r\Eo'^R\Eo!\200\E^G!\E\bA@ \EX:\
+	:k1=^R5\r:k2=^R6\r:k3=^R7\r:k4=^R8\r:k5=^R9\r:\
+	:k6=^R\072\r:k7=^R;\r:k8=^R<\r:k9=^R=\r:kb=\b:kd=\E<:\
+	:kh=\E?:kl=\E>:kr=\E=:ks=\EX:ku=\E;:nd=\E=:\
+	:kD=^?:kP=\E.:kN=\E-:kF=\E\114:kR=\E[:\
+	:rp=\Er%.%+ $<.2*>:se=\Ed:so=\ED:\
+	:te=\EU\Ev  ^Agp\Ep\r\n:\
+	:ti=\EU\Ev^Ah 8p\E?\E>\E?\Ep\n\EX:ts=\E z"\E?\EE:\
+	:ue=\Eg:up=\E;:us=\EG:vb=20\Ek\EK:ve=\Ew:vs=\EW:\
+	:ko=nd,up,dl,im,al,ei:
+#
+#----------------------------------------------------------------------------
+# APL*PLUS/PC Rel 4.0 in terminal mode.
+#    Entries for STSC termcap extensions for display attributes:
+#
+#
+# PC/AT running APL*PLUS/UNX locally under XENIX.
+aplAT|aplPCAT| STSC termcap enhancements for PC/AT console :\
+	:AT=0:A0=\E[m:A1=\E[7m:A2=\E[1m:A3=\E[5m:A4=\E[4m:tc=AT:
+AT|PCAT|pc/at console:\
+	:tc=ansi:
+aplpc|aplibmpc|aplibm pc:\
+	:AT=1:AP=\Ea:A0=@:A1=^A:A2=^B:A3=^D:A4=^H:tc=ibmpc:
+#    Standard termcap entries
+pc|ibmpc|ibm pc:\
+	:ti=\ES0:\
+	:te=\ES1:\
+	:dc=\E[P:dl=\E[M:al=\E[L:im=\E[4h:ei=\E[4l:\
+	:am:bs:cd=^K:ce=^]:cl=^L:cm=^^%r%+ %+ :co#80:li#25:ho=^Y:\
+	:ku=^_:kd=^J:kl=^H:kr=^\:kh=^Y:\
+	:so=\EaA:se=\Ea@:\
+	:nd=^\:up=^_:xn:ma=^\ ^_^P^YH:pt:
+#
+#--------------------
+# APL*PLUS/PC Rel 3.0, 3.1, 3.2 in terminal mode [obsolete].
+p3|ibmpc3|ibm pc rel 3.0:\
+	:am:bs:cl=^L:cm=^^%r%+ %.:co#80:ho=^Y:\
+	:ku=^_:kd=^J:kl=^H:kr=^\:kh=^Y:ce=^]:cd=^K:\
+	:li#25:nd=^\:up=^_:pt:ti=^L:xn:ma=^\ ^_^P^YH:
+#
+#--------------------  
+# Human Design Systems Concept 108
+#    Entry for IPSA's PC108 (these entries must be used with AP124)
+#    Entries for STSC termcap extensions for display attributes:
+aplc8|aplc108|aplc108-8|concept 108 attribute enhancements:\
+#	:SO=^N:SR=^O:\
+	:cd=60\E^E:ce=6\E^U:AT=1:AP=\EN:A0=@:A1= :A2=^P:A3=^B:A4=^D:tc=c108:
+#    Standard termcap entries
+c8|c108|c108-8|concept 108 w/8 pages and ^S/^Q:\
+	:ti=\EU\E F\E^G!\Ev  8p\200\200\200\200\200\200\200\200\Ep\r:\
+	:te=\Ev  ^B p\200\200\200\200\200\200\Ep\r\n:tc=c108-4:
+cS|c108|c108-4|concept 108 w/4 pages and ^S/^Q:\
+ :is=\EU\E F\Ef\E7\E5\E8\E z#\EQ \E z#^W\El\ENH\EK\E\200\Eo&\200\Eo\47\E\200\
+\200\200\200\200\200\200\200\200:\
+	:im=\E^P:ei=\E\200:\
+	:ti=\EU\E F\E^G!\Evh 8p\Ep\r:te=\Ev  \177p\Ep\r\n:\
+	:al=1*\E^R:am:cd=4*\E^C:ce=3\E^U:cl=60^L:cm=\Ea%+ %+ :co#80:\
+	:dc=\E^Q:dl=1*\E^B:eo:li#24:nd=\E=:\
+	:kb=^h:ul:up=\E;:db:us=\EG:ue=\Eg:xn:vs=\EW:ve=\Ew:\
+	:vb=\Ek\200\200\200\200\200\200\200\200\200\200\200\200\200\200\EK:\
+	:ks=\EX:ke=\Ex:ku=\E;:kd=\E<:kl=\E>:kr=\E=:kh=\E?:kP=\E.:kN=\E-:\
+	:kF=\E\114:kR=\E[:k1=\E5:k2=\E6:k3=\E7:so=\ED\EE:se=\Ed\Ee:
+#
+#--------------------
+# HDS Concept AVT
+#    Entries for STSC termcap extensions for display attributes:
+aplc9|aplavt|aplAVT|Concept AVT attribute enhancements:\
+	:AT=0:A0=\E[0m:A1=\E[7m:A2=\E[1m:A3=\E[5m:A4=\E[4m:tc=c9:
+#    Standard termcap entries
+c9|avt|hds concept avt:\
+#    Standard termcap entries
+:is=\E[1*q\E[2!t\E[7!t\E[=4;101;103;119l\E[=107;118;207h\E)1\E[1Q\EW\E[7!y\E[0\0720\07232!r\E[w\E2\r\n:\
+	:ae=^O:al=\E[L:am:as=^N:bs:bt=\E[Z:cd=\E[J:ce=\E[K:\
+	:ch=\E[%i%2G:cl=\E[H\E[J:cm=\E[%i%2;%2H:co#80:cv=\E[%i%2d:\
+	:dc=\E[P:dl=\E[M:do=\E[B:ei=\E1:eo:ho=\E[H:im=\E1:kb=^H:\
+	:kd=\E[B:\
+	:ke=\E[;4!z\E[;8!z\E[;10!z\E[;11!z\E[;12!z\E[3;14!z\E[;7!z\E[;9!z:\
+	:kh=\E[H:kl=\E[D:ko=do,ho,nd,up:kr=\E[C:\
+:ks=\E[1;4!z\E[1;8!z\E[1;10!z\E[1;11!z\E[1;12!z\E[1;14!z\E[3;7!z\E[3;9!z:\
+	:ku=\E[A:li#24:mi:nd=\E[C:pt:se=\E[7!{:so=\E[7m:\
+	:te=\E[w\E2\r\n:ti=\E[1;24w\E2\n:ue=\E[4!{:ul:\
+	:up=\E[A:us=\E[4m:ve=\E[=4;119l:vs=\E[41\E[=119h:xn:
+#
+#
+#--------------------
+# CADMUS Bitmap
+aplbi|aplbip|CADMUS bitmap display terminal with STSC apl:\
+	:al=\Ex:tc=bip:
+#    Standard termcap entries
+bi|bip|CADMUS bitmap display terminal:\
+	:li#66:co#113:cm=\EM%r%+ %+ :\
+	:so=\ER:se=\Er:us=\EU:ue=\Eu:cd=\EJ:ce=\EK:\
+	:cl=\f:ho=\EH:sf=\ES:sr=\Es:sg#0:ug#0:pt:\
+	:nd=\EC:do=\EB:up=\EA:bs:am:dl=\EX:\
+	:ku=\233A:kd=\233B:kl=\233D:kr=\233C:
+#
+#--------------------
+# Hewlett-Packard
+aplh4|aplhp|aplhp2645|apl2645|STSC Enhancements for HP 2641a and similar:\
+	:AT=1:AP=\E&d:A0=@:A1=^B:A2=^H:A3=^A:A4=^D:tc=h4:
+#    Standard termcap entries
+h4|hp|hp2645|2645|hp 264x series:\
+	:if=/usr/lib/tabset/stdcrt:\
+	:al=\EL:am:bs:cd=\EJ:ce=\EK:ch=\E&a%dC:cl=\EH\EJ:cm=6\E&a%r%dc%dY:\
+	:co#80:cv=\E&a%dY:da:db:dc=\EP:dl=\EM:ei=\ER:im=\EQ:\
+	:kb=^H:ku=\EA:kd=\EB:kl=\ED:kr=\EC:kh=\Eh:ks=\E&s1A:ke=\E&s0A:\
+	:li#24:mi:ml=\El:mu=\Em:nd=\EC:pt:se=\E&d@:so=\E&dJ:\
+	:us=\E&dD:ue=\E&d@:up=\EA:xs:
+#
+#--------------------
+# WICAT
+aplMg|aplmg8000|aplMG8000|aplt7000|aplT7000|STSC WICAT enhancements:\
+# Note: Attribute 0 setting forces terminal into Alternate char set;
+#  If standard character set is desired, use :A0=\E[0m:
+# Note: WICAT terminal does not handle combinations of attributes under
+#  the conventions of STSC termcap enhancements.  Only the simple powers
+#  of 2 are supported.  The attribute displayed is the largest power of
+#  2 in the sum;  thus, attribute 3 displays the same as attribute 2, and
+#  attributes 4, 5, 6, and 7 all display as attribute 4.
+	:AT=0:A0=\E[0;11m:
+	:A1=\E[7;11m:
+	:A2=\E[2;11m:
+	:A3=\E[5;11m:
+	:A4=\E[4;11m:tc=t7000:
+#    Standard termcap entries
+Mg|mg8000|MG8000|t7000|T7000:WICAT Systems with APL option:\
+	:ae=\E[10m:al=\E[L:am:as=\E[12m:bs:bt=\E[Z:bw:cd=\E[0J:ce=\E[0K:\
+	:cl=\E[2J:cm=\E[%i%d;%dH:co#80:dc=\E[P:dl=\E[M:do=\E[B:ei=\E[4l:\
+	:f1=\EOP:f2=\EOQ:f3=\EOR:f4=\EOS:f5=\EOm:f6=\EOl:f7=\EOM:f8=\EOn:\
+	:ho=\E[H:im=\E[4h:is=\E=\E\\\E[=l\E[2h\E[3l\E[4l\E[21l:\
+	:k0=\EOp:k1=\EOq:k2=\EOr:k3=\EOs:k4=\EOt:k5=\EOu:k6=\EOv:k7=\EOw:\
+	:k8=\EOx:k9=\EOy:kd=\E[B:kl=\E[D:kr=\E[C:ku=\E[A:ke=\E>:ks=\E=:\
+	:li#24:mi:nd=\E[C:pt:se=\E[0m:so=\E[7m:te=\E>:ti=\E=:\
+	:ue=\E[0m:ul:us=\E[4m:up=\E[A:
+#
+#--------------------
+# FORTUNE SYSTEMS Terminal 
+#
+aplFT|aplfos|aplfortune|STSC enhancements for Fortune system terminal:\
+	:AT=0:A0=\136G\000:
+	:A1=\136H^D:
+	:A2=\136H :
+	:A3=\136H^B:
+	:A4=\136H^P:tc=FT:
+FT|fos|fortune|Fortune system:\
+	:is=^_..:\
+	:li#25:co#80:\
+	:am:bs:bw:\
+	:cl=20^L:cd=3*^\Y:\
+	:ic=5^\Q:dc=5^\W:\
+	:dl=15^\R:al=15^\E:\
+	:cm=^\C%+ %+ :\
+	:ta=^Z:\
+	:ho=10^^:do=3^J:up=3^K:bs=^H:\
+	:kb=^H:kd=^Ay\r:kh=^A?\r:kl=^Aw\r:kr=^Az\r:ku=^Ax\r:\
+	:nl=5^J:\
+	:so=^\H`:se=^\I`:sg=0:\
+	:us=^\HP:ue=^\IP:ug=0:\
+	:ce=^\Z:\
+	:rv=\EH:re=\EI:rg=0:\
+	:GS=\Eo:GE=^O:GG=0:\
+	:GV=-:GH=&:GU=%:GD=#:G1=(:G2= :G3=":G4=*:\
+	:CF=\E]:CO=\E\\:\
+	:WL=^Aa\r:WR=^Ab\r:CL=^Ac\r:CR=^Ad\r:\
+	:DL=^Ae\r:RF=^Af\r:RC=^Ag\r:CW=^Ah\r:\
+	:NU=^Aj\r:EN=^Ak\r:HM=^Al:\
+	:PL=^Am\r:PU=^An\r:PD=^Ao\r:PR=^Ap\r:\
+	:HP=^A@\r:RT=^Aq\r:TB=\r:CN=\177:\
+	:MP=\E+F:
+#
+#--------------------
+# PC220 Terminal Emulator.  (part of Locus/Motorola PC-Interface package.)
+#
+pc220|pc220c|Mot:\
+	:NM=\E[1;25;27m:NB=\E[1;5;27m:NR=\E[1;25;7m:NS=\E[1;5;7m:\
+	:AL=\E[22;25;27m:AB=\E[22;5;27m:AR=\E[22;25;7m:AS=\E[22;5;7m:\
+	:RS=\E[0m:OV#0:\
+# changes made to "ti" entry for SAX compatibility.  jackw 07/21/88
+# original #	:ti=\E>\E[4l\E[?1;?4;?5;?6;?7;?18l\E[?8;?25h\E F:\
+#   added designation of hard character sets:
+#		ASCII as G0
+#		Supplemental as G1
+	:ti=\E>\E[4l\E[?1;?4;?5;?6;?7;?18l\E[?8;?25h\E F\E(B\E)<:\
+	:te=\E7\E[36l\E[1;24r\E8\E[?7h\E G:\
+	:cr=^M:do=^J:nl=^J:bl=^G:co#80:li#24:cl=\E[H\E[J:\
+	:le=^H:bs:am:cm=\E[%i%d;%dH:nd=\E[C:up=\E[A:\
+	:ce=\E[K:cd=\E[J:so=\E[7m:se=\E[m:us=\E[4m:ue=\E[m:\
+	:md=\E[1m:mr=\E[7m:mb=\E[5m:me=\E[m:is=\E[1;24r\E[24;1H:\
+	:dl=\E[1M:al=\E[1L:dc=\E[1P:\
+	:sr=\EM:kb=\177:ku=\E[A:kd=\E[B:kr=\E[C:kl=\E[D:\
+	:kD=\E[3~:kI=\E[2~:kP=\E[5~:kN=\E[6~:kF=\EOY:kR=\EOW:kE=\E[25~:\
+	:k0=\E[17~:k1=\E[18~:k2=\E[19~:k3=\E[20~:k4=\E[21~:\
+	:k5=\E[23~:k6=\E[24~:k7=\E[25~:k8=\E[26~:\
+	:k9=\E[28~:ka=\E[29~:ho=\E[H:ta=^I:pt:
+#
+#-------
+# Callan Data Systems 200 with built-in enhanced VT100 terminal
+Cv|cvt100|Callan Unistar 200:\
+	:al=\E[L:dl=99\E[M:\
+	:dc=\E[P:im=\E[4h:ei=\E[4l:\
+	:co#80:li#24:cl=50\E[;H\E[2J:bs:am:cm=5\E[%i%2;%2H:nd=2\E[C:up=2\E[A:\
+	:ce=3\E[K:cd=50\E[J:so=2\E[7m:se=2\E[m:us=2\E[4m:ue=2\E[m:\
+	:ks=\E[?1l\E=:ke=\E>:as=^N:ae=^O:\
+	:is=\E)0\E[?3l\E[?4l\E[?7h\E[?8h:te=:\
+	:rf=/usr/lib/tabset/vt100:ku=\E[A:kd=\E[B:kr=\E[C:kl=\E[D:\
+	:kh=\E[H:pt:sr=5\EM:vt#3:xn:f0=\EOp:f1=\EOq:f2=\EOr:\
+	:f3=\EOs:f4=\EOt:f5=\EOu:f6=\EOv:f7=\EOw:f8=\EOx:f9=\EOy:\
+	:k0=\EOT:k1=\EOP:k2=\EOQ:k3=\EOR:k4=\EOS:k5=\EOm:k6=\EOl:k7=\EOM:\
+	:k8=\EOn:NM=\E[0;1m:NB=\E[0;1;5m:NR=\E[0;1;7m:NS=\E[0;1;5;7m:\
+	:AL=\E[m:AB=\E[0;5m:AR=\E[0;7m:AS=\E[0;5;7m:\
+	:sc=\E7:rc=\E8:cs=\E[%i%2;%2r:
+#
+#--------------------
+#
+# PROCOMM+ terminal emulator (vt100-like, but capable of 8-bit output).
+procomm:\
+	:SC:kP=\EOR:kN=\EOS:tc=vt100-am:
+#
+#--------------------
+#
+# DEC VT100 Terminal (Kermit emulation)
+d0|vt100|vt100-am|vt100|aj520|dec vt100:\
+	:cr=^M:do=^J:nl=1.5*^J:bl=^G:co#80:li#24:cl=60\E[;H\E[2J:\
+	:le=^H:bs:am:cm=5\E[%i%d;%dH:nd=2\E[C:up=2\E[A:\
+	:ce=3\E[K:cd=50\E[J:so=2\E[7m:se=2\E[m:us=2\E[4m:ue=2\E[m:\
+	:md=2\E[1m:mr=2\E[7m:mb=2\E[5m:me=2\E[m:is=\E[1;24r\E[24;1H:\
+	:rs=\E>\E[?3l\E[?4l\E[?5l\E[?7h\E[?8h:ks=\E[?1h\E=:ke=\E[?1l\E>:\
+	:rf=/usr/lib/tabset/vt100:ku=\E[A:kd=\E[B:kr=\E[C:kl=\E[D:kb=^H:\
+#	:kD=\E[P:\
+	:kD=^?:\
+#	:kE=\E[M:\
+	:kE=^E:\
+	:kh=\E[H:\
+	:kP=\EOZ:kN=\EO[:kF=\EON:kR=\EOO:\
+	:ho=\E[H:k1=\EOP:k2=\EOQ:k3=\EOR:k4=\EOS:ta=1^I:pt:sr=1.5*\EM:vt#3:xn:\
+	:sc=\E7:rc=\E8:cs=10\E[%i%d;%dr:\
+	:kI=\E[2~:
+#
+d1|vt100|vt100-nam|vt100 w/no am:\
+	:am@:xn@:tc=vt100-am:
+#
+#--------------------
+#
+# Motorola TM220 Terminal 
+apltm|tm220apl|Motorola tm220apl:\
+	:AT=0:A0=\E[0m:A1=\E[7m:A2=\E[1m:A3=\E[5m:A4=\E[4m:\
+	:SO=^N:SR=^O:SC:tc=tm220:
+tm|tm220|Motorola TM220:\
+:is=\E[1*q\E[2!t\E[7!t\E[=4;101;103;119l\E[=107;118;207h\E)1\E[1Q\EW\E[7!y\E[0\0720\07232!r\E[w\E2\r\n:\
+	:ae=^O:al=\E[L:am:as=^N:bt=\E[Z:cd=\E[J:ce=\E[K:\
+	:ch=\E[%i%2G:cl=\E[H\E[J:cm=\E[%i%2;%2H:co#80:cv=\E[%i%2d:\
+	:dc=\E[P:dl=\E[M:eo:ho=\E[H:kb=^?:\
+	:im=\E[4h:ei=\E[4l:\
+	:kd=\E[B:kD=\E[3~:kI=\E[2~:kP=\E[5~:kN=\E[6~:kF=\E[19~:kR=\E[18~:\
+	:ke=\E[;4!z\E[;8!z\E[;10!z\E[;11!z\E[;12!z\E[3;14!z\E[;7!z\E[;9!z:\
+	:kh=\E[H:kl=\E[D:kr=\E[C:\
+:ks=\E[1;4!z\E[1;8!z\E[1;10!z\E[1;11!z\E[1;12!z\E[1;14!z\E[3;7!z\E[3;9!z:\
+	:ku=\E[A:li#24:mi:nd=\E[C:pt:se=\E[0m:so=\E[7m:\
+	:te=\E[w\E2\r\n:ti=\E[1;24r\E2\n:ue=\E[4!{:ul:\
+	:up=\E[A:do=\E[B:us=\E[4m:ve=\E[=4;119l:vs=\E[41\E[=119h:xn:
+#
+#--------------------
+#
+# DEC VT220 Terminal with downloaded STSC APL character set
+aplda|tm228apl|tm229apl|aplvt220|aplvt200|DEC vt220:\
+	:AT=0:A0=\E[0m:A1=\E[7m:A2=\E[1m:A3=\E[5m:A4=\E[4m:\
+	:SO=^N:SR=^O:SC:tc=vt220:
+da|vt220|vt200|tm228|tm229|DEC vt220:\
+:is=\E[1*q\E[2!t\E[7!t\E[=4;101;103;119l\E[=107;118;207h\E)1\E[1Q\EW\E[7!y\E[0\0720\07232!r\E[w\E2\r\n:\
+	:ae=^O:al=\E[L:am:as=^N:bt=\E[Z:cd=\E[J:ce=\E[K:\
+	:ch=\E[%i%2G:cl=\E[H\E[J:cm=\E[%i%2;%2H:co#80:cv=\E[%i%2d:\
+	:dc=\E[P:dl=\E[M:do=\E[B:eo:ho=\E[H:kb=^?:\
+	:im=\E[4h:ei=\E[4l:\
+	:kd=\E[B:kD=\E[6~:kI=\E[5~:kP=\E[20~:kN=\E[21~:kF=\E[19~:kR=\E[18~:\
+	:ke=\E[;4!z\E[;8!z\E[;10!z\E[;11!z\E[;12!z\E[3;14!z\E[;7!z\E[;9!z:\
+	:kh=\E[H:kl=\E[D:kr=\E[C:kE=\EOP:\
+:ks=\E[1;4!z\E[1;8!z\E[1;10!z\E[1;11!z\E[1;12!z\E[1;14!z\E[3;7!z\E[3;9!z:\
+	:ku=\E[A:li#24:mi:nd=\E[C:pt:se=\E[0m:so=\E[7m:\
+	:te=\E[w\E2\r\n:ti=\E[1;24r\E2\n:ue=\E[4!{:ul:\
+	:up=\E[A:us=\E[4m:ve=\E[=4;119l:vs=\E[41\E[=119h:xn:
+#
+#--------------------
+#
+#    Entries for STSC termcap extensions for display attributes:
+apls4|aplPC7300|aplunixpc|aplpc7300|APL variant of UNIX pc:\
+	:AT=0:A0=\E[0m:A1=\E[7m:A2=\E[1m:A3=\E[2m:A4=\E[4m:tc=s4:
+s4|PC7300|unixpc|pc7300|Safari 4:\
+	:al=\E[1L:am:bs:\
+	:cd=\E[0J:ce=\E[0K:cl=\E[2J\E[H:cm=\E[%i%2;%2H:co#80:\
+	:dc=\E[1P:dl=\E[1M:do=\E[B:ei=:ho=\E[H:\
+	:ic=\E[1@:im=:kb=\10:kd=\E[B:kl=\E[D:kr=\E[C:ku=\E[A:li#24:\
+	:k1=\EOc:k2=\EOd:k3=\EOe:k4=\EOf:k5=\EOg:k6=\EOh:k7=\EOi:k8=\EOj:\
+	:kD=\ENf:kE=\EOa:kF=\E[T:kR=\E[S:kP=\E[V:kN=\E[U:\
+	:nd=\E[C:se=\E[m:so=\E[2;7m:ue=\E[m:up=\E[A:us=\E[4m:\
+	:EE=\E[m:BO=\E[0;7m:CV=\E[=C:CI=\E[=1C:KM=/usr/lib/ua/kmap.s4:
+#
+#---------------------
+#
+# console of 80386 PC running ISC 386ix
+# this termcap entry was patched together from various sources; I'll
+# keep the remaining information here, not to loose track.  JDV, 13 July 1989
+#	:cr=\r:le=\b:bl=^G:mb=\E[5m:md=\E[1m:ae=^O:as=^N:bt=\E[Z:\
+#	:ch=\E[%i%2G:cv=\E[%i%2d:eo:kb=\b:me=\E[m:
+#	:sa=\E[%?%p1%t7;%;%?%p2%t4;%;%?%p3%t7;%;%?%p4%t5;%;%?%p6%t1;%;m:
+#	:us=\E[4m:ve=\E[=4;119l:vs=\E[41\E[=119h:xn:\
+#	:is=\E[1*q\E[2!t\E[7!t\E[=4;101;103;119l\E[=107;118;207h\E)1\E[1Q\EW\E[7!y\E[0\0720\07232!r\E[w\E2\r\n:\
+#	:DO=\E[%p1%dB:LE=\E[%p1%dD:RI=\E[%p1%dC:UP=\E[%p1%dA:\
+#	:DL=\E[%p1%dM:IC=\E[%p1%d@:AL=\E[%p1%dL:sf=\n:\
+#	:@7=\E[Y:k1=\EOP:k;=\EOY:F1=\EOZ:F2=\EOA:k2=\EOQ:\
+#	:k3=\EOR:k4=\EOS:k5=\EOT:k6=\EOU:k7=\EOV:\
+#	:k8=\EOW:k9=\EOX:\
+#	:sa=\E[%?%p1%t7;%;%?%p2%t4;%;%?%p3%t7;%;%?%p4%t5;%;%?%p6%t1;%;m:\
+#	:te=\E[w\E2\r\n:\
+AT386|AT386-M|PC386 console under ISC Unix:\
+	:am:bw:mi:pt:co#80:li#25:\
+	:ti=\E[1;24r\E2\n:ul:\
+	:te=\E[w\E[H\E[J\r\n:\
+	:up=\E[A:do=\E[B:le=\E[D:nd=\E[C:\
+	:cm=\E[%i%2;%2H:ic=\E[@:im=:ei=:\
+	:al=\E[L:dl=\E[M:dc=\E[P:\
+	:ho=\E[H:ce=\E[K:cd=\E[J:cl=\E[H\E[J:\
+	:so=\E[7m:se=\E[m:\
+	:ks=\E[1;4!z\E[1;8!z\E[1;10!z\E[1;11!z\E[1;12!z\E[1;14!z\E[3;7!z\E[3;9!z:\
+	:ke=\E[;4!z\E[;8!z\E[;10!z\E[;11!z\E[;12!z\E[3;14!z\E[;7!z\E[;9!z:\
+	:ku=\E[A:kd=\E[B:kl=\E[D:kr=\E[C:\
+	:kh=\E[H:kI=\E[@:kD=^?:kN=\E[U:kP=\E[V:\
+	:kF=\EOY:kR=\EOW:kE=\EOP:
+#
+#--------------------
+#
+# various flavors of Xwindows terminal emulator
+vs|xterm|vs100|xterm terminal emulator (X window system):\
+#original version: li#65
+	:cr=^M:do=^J:nl=^J:bl=^G:le=^H:ho=\E[H:\
+	:co#80:li#34:cl=\E[H\E[2J:bs:am:cm=\E[%i%d;%dH:nd=\E[C:up=\E[A:\
+	:ce=\E[K:cd=\E[J:so=\E[7m:se=\E[m:us=\E[4m:ue=\E[m:\
+	:md=\E[1m:mr=\E[7m:mb=\E[5m:me=\E[m:\
+	:is=\E[r\E[m\E[2J\E[H\E[?7h\E[?1;3;4;6l:\
+	:ku=\EOA:kd=\EOB:kr=\EOC:kl=\EOD:kb=^H:\
+	:k1=\EOP:k2=\EOQ:k3=\EOR:k4=\EOS:ta=^I:pt:sf=\n:sr=\EM:\
+	:al=\E[L:dl=\E[M:ic=\E[@:dc=\E[P:\
+	:MT:ks=\E[?1h\E=:ke=\E[?1l\E>:\
+	:rs=\E[r\E<\E[m\E[2J\E[H\E[?7h\E[?1;3;4;6l:xn:\
+	:AL=\E[%dL:DL=\E[%dM:IC=\E[%d@:DC=\E[%dP:\
+	:ti=\E7\E[?47h:\
+	:kh=\E[H:\
+	:te=\E[2J\E[?47l\E8:\
+	:hs:ts=\E[?E\E[?%i%dT:fs=\E[?F:es:ds=\E[?E:\
+	:kI=\E[2~:kD=^?:kP=\E[5~:kN=\E[6~:kF=\EOY:kR=\EOW:kE=^E:
+#
+#	:is=\E[1;24r\E[24;1H:\
+#	:ti=\E>\E[4l\E[?1;?4;?5;?6;?7;?18l\E[?8;?25h\E F\E(B\E)<:\
+#	:te=\E7\E[36l\E[1;24r\E8\E[?7h\E G:\
+#	:kb=\177:ku=\E[A:kd=\E[B:kr=\E[C:kl=\E[D:\
+#	:k0=\E[17~:k1=\E[18~:k2=\E[19~:k3=\E[20~:k4=\E[21~:\
+#	:k5=\E[23~:k6=\E[24~:k7=\E[25~:k8=\E[26~:\
+#	:k9=\E[28~:ka=\E[29~:ho=\E[H:ta=^I:pt:
+v2|xterms|vs100s|xterm terminal emulator (small)(X window system):\
+#original version:	:co#80:li#24:tc=xterm:
+	:co#80:li#34:tc=xterm:
+#
+#--------------------
+#
+# simple hardcopy terminal
+sx|spinx|spintronics hardcopy terminal:\
+:co#132:os:hc:
+#
+#--------------------
+#
+# 'last resort' terminal - supplied default = ANSI
+li|ansi|Ansi standard crt:\
+	:li#34:co#80:\
+	:al=\E[L:am:bs:cd=\E[J:ce=\E[K:cl=\E[2J\E[H:cm=\E[%i%d;%dH:\
+	:dc=\E[P:dl=\E[M:dn=\E[B:ho=\E[H:ic=\E[@:\
+	:nd=\E[C:ms:pt:so=\E[7m:se=\E[m:us=\E[4m:ue=\E[m:up=\E[A:\
+	:kb=^h:kh=\E[H:ku=\EOA:kd=\EOB:kl=\EOD:kr=\EOC:eo:\
+	:kI=\E[2~:kD=\177:\
+	:kE=^E:\
+	:GS=\E[12m:GE=\E[10m:GV=\63:GH=D:\
+	:G1=?:G2=Z:G3=@:G4=Y:\
+	:GU=A:GD=B:GC=E:GL=C:GR=\64:RT=^J:
+#
+#--------------------
+#
+#
+lm|ansi-m|Ansi standard crt (monochrome):\
+	:tc=ansi:
+#
+#--------------------
+#
+IH|hft|AIWS High Function Terminal:\
+	:al=\E[L:cr=^M:do=^J:sf=^J:bl=^G:am:le=^H:cd=\E[J:\
+	:ce=\E[K:cl=\E[H\E[2J:cm=\E[%i%d;%dH:co#106:li#51:\
+	:dc=\E[P:dl=\E[M:ho=\E[H:kn=\r:\
+	:ic=\E[@:im=\E6:ei=\E6:\
+	:md=\E[1m:mr=\E[7m:mb=\E[5m:mk=\E[8m:me=\E[0m:\
+	:ku=\E[A:kd=\E[B:kl=\E[D:kr=\E[C:kh=\E[H:kb=^H:\
+	:nd=\E[C:ta=^I:up=\E[A:xo:\
+	:ue=\E[m:us=\E[4m:se=\E[m:so=\E[7m:\
+	:kP=\E[150q:kN=\E[154q:\
+	:k1=\E[001q:k2=\E[002q:k3=\E[003q:k4=\E[004q:\
+	:k5=\E[005q:k6=\E[006q:k7=\E[007q:k8=\E[008q:\
+	:k9=\E[009q:ka=\E[010q:
+#
+#--------------------
+#
+ibm6153|aixterm-m|IBM 6153 Black & White display:\
+	:tc=ibm5151:
+
+ibm6154|aixterm|IBM 6154 Color displays:\
+	:tc=ibm5154:
+
+hft-m|IBM Megapel Monochrome display:\
+	:tc=ibm5151:
+
+ibm5154|IBM 5154 Color display:\
+	:tc=ibm5151:
+
+ibm5151|wy60-AT|wyse60-AT|IBM 5151 Monochrome display:\
+	:co#80:li#34:\
+#	:kD=\E[P:kI=\E[139q:\
+	:kN=\E[154q:kP=\E[150q:\
+	:tc=ansi:
+#	:cr=^M:do=^J:nl=^J:bl=^G:le=^H:ho=\E[H:\
+#	:cl=\E[H\E[2J:bs:am:cm=\E[%i%d;%dH:nd=\E[C:up=\E[A:\
+#	:ce=\E[K:cd=\E[J:so=\E[7m:se=\E[m:us=\E[4m:ue=\E[m:\
+#	:md=\E[1m:mr=\E[7m:me=\E[m:\
+#	:ku=\EA:kd=\EB:kr=\EC:kl=\ED:kb=^H:kh=\E[H:\
+#	:ta=^I:pt:sf=\n:sr=\EM:\
+#	:al=\E[L:dl=\E[M:ic=\E[@:dc=\E[P:\
+#	:MT:ks=\E[?1h\E=:ke=\E[?1l\E>:\
+#	:is=\E[r\E[m\E[2J\E[H\E[?7h\E[?1;3;4;6l:\
+#	:rs=\E[r\E<\E[m\E[2J\E[H\E[?7h\E[?1;3;4;6l:xn:\
+#	:AL=\E[%dL:DL=\E[%dM:IC=\E[%d@:DC=\E[%dP:\
+#	:ti=\E7\E[?47h:te=\E[2J\E[?47l\E8:\
+#	:hs:ts=\E[?E\E[?%i%dT:fs=\E[?F:es:ds=\E[?E:\
+#	:GS=\E[12m:GE=\E[10m:GV=\63:GH=D:\
+#	:G1=?:G2=Z:G3=@:G4=Y:\
+#	:GU=A:GD=B:GC=E:GL=C:GR=\64:RT=^J:
+#	:k1=\E001q:k2=\E002q:k3=\E003q:k4=\E004q:\
+#	:k5=\E005q:k6=\E006q:k7=\E007q:k8=\E008q:\
+##	:k9=\E009q:k10=\E010q:k11=\E011q:k12=\E012q:\
+#	:dn=\E[B:ei=:im=:ms:eo:
+#
+#	cr=^M, cud1=^J, ind=\E[S, bel=^G, il1=\E[L, am, cub1=^H, ed=\E[J,
+#	el=\E[K, clear=\E[H\E[J, cup=\E[%i%p1%d;%p2%dH, cols#80, lines#25,
+#	dch1=\E[P,      dl1=\E[M,       home=\E[H,
+#	smir=\E[4h,     rmir=\E[4l,     il=\E[%p1%dL,   dl=\E[%p1%dM,
+#	bold=\E[1m, rev=\E[7m, blink=\E[5m, invis=\E[8m, sgr0=\E[0m,
+#	sgr=\E[%?%p1%t;7%;%?%p2%t;4%;%?%p3%t;7%;%?%p4%t;5%;%?%p6%t;1%;m,
+#	kpp=\E[150q,    knp=\E[154q,
+#	kf1=\E[001q,    kf2=\E[002q,    kf3=\E[003q,    kf4=\E[004q,
+#	kf5=\E[005q,    kf6=\E[006q,    kf7=\E[007q,    kf8=\E[008q,
+#	kf9=\E[009q,    kf10=\E[010q,   kf11=\E[011q,   kf12=\E[012q,
+#	kf13=\E[013q,   kf14=\E[014q,   kf15=\E[015q,   kf16=\E[016q,
+#	kf17=\E[017q,   kf18=\E[018q,   kf19=\E[019q,   kf20=\E[020q,
+#	kf21=\E[021q,   kf22=\E[022q,   kf23=\E[023q,   kf24=\E[024q,
+#	kf25=\E[025q,   kf26=\E[026q,   kf27=\E[027q,   kf28=\E[028q,
+#	kf29=\E[029q,   kf30=\E[030q,   kf31=\E[031q,   kf32=\E[032q,
+#	kf33=\E[033q,   kf34=\E[034q,   kf35=\E[035q,   kf36=\E[036q,
+#	bw,     it#8,   msgr,
+#	hpa=\E[%i%p1%dG,                ech=\E[%p1%dX,
+#	kend=\E[146q,   ktab=^I,
+#	kdch1=\E[P,     kind=\E[151q,   kich1=\E[139q,  krmir=\E[4l,
+#	knl=\r,         kbtab=\E[Z,     kri=\E[155q,    kact=\E[114q,
+#	cub=\E[%p1%dD,  cuf=\E[%p1%dC,  indn=\E[%p1%dS, rin=\E[%p1%dT,
+#	ri=\e[T,        cuu=\E[%p1%dA,  cud=\E[%p1%dB,
+#	box1=\332\304\277\263\331\300\302\264\301\303\305,
+#	box2=\311\315\273\272\274\310\313\271\312\314\316,      batt2=md,
+#	kil1=\E[140q,   kel=\E[142q,    kclr=\E[144q,   ked=\E[148q,

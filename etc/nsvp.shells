@@ -1,0 +1,18 @@
+# nsvp.sh - Copyright (c) 2000, Soliton Associates Limited
+#
+#
+# This file lists the shells that are recognized by NSVP.
+# IE: if the "shell" field in /etc/passwd is not empty and is not in this
+# this file, then that user cannot sign on via NSVP.
+#
+# The raison d'etre of this file are accounts like "sync" on the Sun
+# that have no password, yet can only do a specific task.
+#
+
+/bin/sh		# Bourne shell
+/bin/csh	# C shell
+/bin/ksh	# Korn shell
+/bin/bash       # Bourne Again shell (most commonly used in Linux)
+/usr/bin/tcsh	# Tenex csh (commonly used in Linux)
+/bin/tcsh	# (ditto)
+#/bin/rsh	# Restricted Bourne shell (normally not included)

@@ -1,0 +1,172 @@
+#!/bin/sh 
+# sax - Copyright (c) 2000,  Soliton Associates Limited
+#
+#
+# Main SAX script for all environments
+
+# check for the SVP
+# to override checking for SVP, SAXNOSVP must be set to non-null value
+checksvp()
+{
+  # check if SVP is available
+  SVPOK=`2>/dev/null $SAXDIR/bin/svpdump -site | grep -i 'SVP is available'`
+  if [ "$SVPOK" = "" ]
+  then
+    echo "SAX cannot run without the SVP"
+    exit
+  fi
+}
+
+validateHostid()
+{
+	# Validate machine HOSTID
+	if hostid 2>&1 >/dev/null
+	then
+		HOSTID=`hostid \
+		| tr abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ \
+		| tr -d '0X'`
+	else
+		echo "Cannot execute command \'hostid\'. Check your PATH variable."
+		exit 3
+	fi
+	
+	# convert from hex to decimal
+	DHOSTID=`cat << /EOF | bc
+	ibase=16
+	$HOSTID
+/EOF`
+	
+	# check for non-digits
+	if echo $DHOSTID | grep '[a-zA-Z]' 
+	then
+		echo "Invalid hostid. Call your system administrator."
+		exit 3
+	fi
+	
+	# check for null hostid
+	if [ -$DHOSTID -eq 0 ]
+	then
+		echo "Invalid hostid. Call your system administrator."
+		exit 3
+	fi
+}
+
+# validateHostid
+
+SAXDIR=${SAXDIR:-/usr/sax/rel}
+SYS=`$SAXDIR/bin/sys`
+APLSIZE_ROWS=${APLSIZE_ROWS:-34}
+APLSIZE_COLS=${APLSIZE_COLS:-80}
+APLPATH=${APLPATH:-$SAXDIR/bin/apl}	# interpreter (7-bit w/session mgr)
+APLFONT=${APLFONT:-saxmedium}
+SAXUMASK=`umask`
+SAX_XTERM_OPTIONS=${SAX_XTERM_OPTIONS:-} # Options passed along to xterm if we start it
+
+export SAXDIR SYS APLSIZE_ROWS APLSIZE_COLS APLPATH APLFONT SAXUMASK
+export SAX_XTERM_OPTIONS
+
+checksvp
+
+# case $SYS in
+# SYSIBM6K)
+# 	  LIBPATH="${LIBPATH}:${SAXDIR}/lib"
+# 	  export LIBPATH
+# 	  ;;
+# SYSSPARC | SYSSOLIX86 | POSIX)
+# 	  LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${SAXDIR}/lib"
+# 	  export LD_LIBRARY_PATH
+# 	  ;;
+# *)
+# 	  ;;
+# esac
+
+case $SYS in
+       IX86)  # Linux specific terminal needs
+               SAX_XTERM_OPTIONS=" +u8 $SAX_XTERM_OPTIONS"
+               LANG=C
+               LC_ALL=C
+               export LANG LC_ALL
+               ;;
+       *)
+               ;;
+esac
+
+APLfontn=`basename $APLFONT`
+
+#---------------- X Window using terminal emulator.
+
+if [ "$DISPLAY" ]
+then
+	xmodmap $SAXDIR/lib/term/saxmod.map
+
+	xrdb -query | grep "SAX.*translations:" > /dev/null
+	if [ $? != 0 ]
+	then
+		xrdb -nocpp -merge $SAXDIR/lib/term/saxkey.map
+	fi
+
+	if [ $SYS = SYSIBM6K ]
+	then
+		TERMPATH=${TERMPATH:-xterm}
+	else
+		TERMPATH=${TERMPATH:-xterm}
+	fi
+
+	if [ `basename $APLPATH` = "apl-8" ]
+	then
+		TERMPATH=$TERMPATH" -sb -si -sk "
+	else
+		TERMPATH=$TERMPATH" -bg black -fg white"
+	fi
+
+	SAXname=${SAXname:-"SAX"}
+	SAXrsrc="${SAXname}${SAXqual:+.${SAXqual}}"
+	SAXtitle=${SAXtitle:-$SAXname"@"`uname -n`}
+
+	$TERMPATH -name $SAXrsrc -n "$SAXtitle" \
+		-title "$SAXtitle" -T "$SAXtitle" \
+		-g $APLSIZE_COLS"x"$APLSIZE_ROWS \
+		-fn $APLfontn \
+		$SAX_XTERM_OPTIONS \
+               	-tm "intr ^c erase ^h" \
+ 		-e $SAXDIR/bin/sax_run "$@" &
+	exit 0
+fi
+
+#---------------- SunView using cmdtool.
+
+if [ "$WINDOW_PARENT" ]
+then
+	TERM=sun-cmd; export TERM
+
+# Keyboard mapping is changed for 8-bit non-session manager interpreter.
+
+	if	[ "apl-8" = `basename $APLPATH` ]
+	then
+		if	[ $SYS = SYSSPARC ]
+		then
+			loadkeys $SAXDIR/lib/term/aplsparc.key
+		elif	[ $SYS = SYSS386I ]
+		then
+			loadkeys $SAXDIR/lib/term/apls386i.key
+		fi
+	fi
+
+# Supply font path name if user has not specified a full path name.
+
+	if [ $APLFONT = $APLfontn ]
+	then
+		APLFONT=$SAXDIR/lib/fonts/$APLfontn
+	fi
+
+	cmdtool -Wl "SAX" -Wh $APLSIZE_ROWS -Ww $APLSIZE_COLS \
+		-Wt $APLFONT \
+		-WT $APLFONT \
+		-WI $SAXDIR/lib/fonts/apl.icon \
+ 		$SAXDIR/bin/sax_run "$@" &
+	exit 0
+fi
+
+#---------------- Ascii terminal (or emulator) or native mode console.
+
+. $SAXDIR/bin/sax_run "$@"

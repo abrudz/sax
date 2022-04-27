@@ -1,0 +1,158 @@
+#!/bin/sh
+# ifcc - Copyright (c) 1994, Soliton Associates Limited
+#
+
+# This shell script will compile a dynamically-loadable file especially
+# for use for intrinsic functions.
+
+#set -x		# For debugging
+
+if [ "`echo -n OK`" = "OK" ] ; then
+#  echo Using BSD
+  ECHOB='-n'
+  ECHOE= 
+else
+#  echo Using SYSV
+  ECHOB=
+  ECHOE='\c'
+fi
+
+
+if [ $# -eq 0 ]; then
+	echo "Usage: $0 [-g] [library[.si]] input files...";
+	exit 1
+fi;
+
+SAXDIR=${SAXDIR:-/usr/sax/rel}
+SAXIFSTUB=${SAXIFSTUB:-$SAXDIR/lib/ifstub.o}
+SYSI=${SYSI:-`$SAXDIR/bin/sys -i`}
+#CC=${CC:-cc}
+CC=gcc
+TABLENAME=__if_entry_table
+ENTRYFN=_if_entry
+TMPFIL=ifccgen.$$
+OUTTMP=$TMPFIL.c
+CFLAGS=${CFLAGS:-""}
+LFLAGS=${LFLAGS:-""}
+
+case $1 in
+ -g)	DEBUG=1; CFLAGS="$CFLAGS -g"; shift;;
+ -*)	echo "Usage: $0 [-g] [library[.si]] input files..."; exit 1;;
+ *)		DEBUG=0;;
+esac
+
+if [ `expr $1 : '.*\.c$'` != 0 ]; then
+	echo "Are you sure you want the libname to be $1.si?"
+	exit 1
+fi
+
+LIBNAME="`dirname $1`/`basename $1 .si`.si"; shift
+rm -f $LIBNAME
+
+# We use egrep as grep's pattern matching engine is much slower (unless it's
+# GNU grep). This shows why I hate sed at times. We allow /* IF: x */, where
+# `x' is anything, so that we can transport system IFs to dynamic IFs.
+#
+#  We now look for      /* SAXIF: name */
+#  SHould fix this up -- currently the final */ must be IMMEDIATELY after name.
+egrep -h '^[ 	]*/\*[ 	]*SAXIF:' $* | 
+  sed 's;^[ 	]*/\*[ 	]*SAXIF:[  ]*\(.*\)[  ]*\*/$;\1;' > $TMPFIL
+
+echo $ECHOB 'IFs present: ' $ECHOE ; tr '\012' ',' < $TMPFIL; echo
+
+cat > $OUTTMP <<EOF
+/* This file should NOT be used for ANYTHING! */
+#define NULL	0L
+/* Intrinsic function prototypes */
+EOF
+
+# Note that the actual prototypes don't matter for this, as this is only
+# to let the compiler know that these are functions.
+sed 's/\(.*\)/void *\1();/' $TMPFIL >>$OUTTMP
+
+# Now create the structures
+cat >>$OUTTMP << EOF
+typedef struct { char *name; void *ptr; } TABLE;
+TABLE $TABLENAME[] = {
+EOF
+
+sed 's/^\(.*\)/{ "\1", (void *) \1 },/' $TMPFIL >>$OUTTMP
+cat >>$OUTTMP <<EOF
+{ NULL, NULL }
+};
+EOF
+
+# finished $OUTTMP
+
+CFILES=""; OFILES=""
+for i in $OUTTMP $*; do
+	if [ `expr $i : '.*\.c$'` != 0 ]; then
+		CFILES="$CFILES $i"
+	else
+		if [ `expr $i : '.*\.stub'` = 0 ]; then
+			OFILES="$OFILES $i"
+		fi
+	fi
+done
+OFILES="$OFILES `echo $CFILES | sed 's/\.c/.o/g'`"
+
+# For debugging:
+# echo "CFILES are $CFILES"
+# echo "OFILES are $OFILES"
+case $SYSI in
+###
+#  mbc 14 FEB 96
+#  the define _BSD is necessary to bypass conflicting prototype of
+#  ioctl() in unistd.h
+#  the AIX4 define switches to a special function prototype for select()
+#  in Sunix.c (which is really messy).
+###
+#  ima 21 OCT 98
+#  -H8 ld option is sufficient for AIX 4.<3
+#  AIX 4.3 does require -H32 at least
+#    -Hn means align sections at n byte boundaries
+###
+#  ldb 26 JAN 99
+#  Due to an apparent ld bug on AIX 4.3 LIBPATH must be set to /usr/lib/
+#  while building intrinsics in order to avoid run-time problems with
+#  loading intrinsic functions that require libc.a
+###
+  AIX4)
+	export LIBPATH=/usr/lib/
+	com="$CC -c $CFLAGS -DAIX4 -D_BSD $CFILES && \
+	ld -H32 -o $LIBNAME -e $ENTRYFN $OFILES $SAXIFSTUB $LFLAGS -lc"
+	;;
+  AIX5)
+	export LIBPATH=/usr/lib/
+	com="$CC -c $CFLAGS -DAIX5 -D_BSD $CFILES && \
+	ld -H32 -o $LIBNAME -e $ENTRYFN $OFILES $SAXIFSTUB $LFLAGS -lc"
+	;;
+  SunOS5)
+	com="$CC -c $CFLAGS $CFILES &&  \
+	ld -G -o $LIBNAME $OFILES $SAXIFSTUB $LFLAGS -lc"
+	;;
+  HPUXB)
+	com="$CC -c $CFLAGS $CFILES &&  \
+	ld -r -o $LIBNAME $OFILES $SAXIFSTUB $LFLAGS -lc"
+		;;
+  Linux2)
+	com="$CC -c $CFLAGS $CFILES &&  \
+	ld -shared -o $LIBNAME $OFILES $SAXIFSTUB $LFLAGS -lc"
+	;;
+  *)
+	echo "Unknown system type: $SYSI"
+	exit 1
+	;;
+esac
+
+# Execute the command
+echo echo $com
+
+eval "$com"
+res=$?
+if [ $res -ne 0 ]; then
+	exit 1
+fi
+rm -f $TMPFIL $OUTTMP $OFILES
+
+echo Result is in $LIBNAME
